@@ -1,0 +1,6 @@
+portfolio-images/
+.superpowers/
+.worktrees/
+dist/
+test-results/
+playwright-report/
