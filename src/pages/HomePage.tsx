@@ -4,17 +4,19 @@ import { Hero } from '../components/Hero';
 import { ProductGrid } from '../components/ProductGrid';
 import { TrustStrip } from '../components/TrustStrip';
 import { getProducts } from '../data/catalog';
+import { useCart } from '../hooks/useCart';
 
 const products = getProducts();
 
 export function HomePage() {
+  const { add } = useCart();
   return (
     <main>
       <Hero />
       <TrustStrip />
       <section className="home-catalog section-wrap">
         <div className="section-heading"><div><p className="eyebrow">Сейчас в саду</p><h2>Ароматы, которые<br /><em>хочется носить</em></h2></div><Link className="text-link" to="/catalog">Все 114 ароматов <ArrowRight size={16} /></Link></div>
-        <ProductGrid products={products.slice(0, 8)} onReset={() => undefined} />
+        <ProductGrid products={products.slice(0, 8)} onReset={() => undefined} onAdd={add} />
       </section>
       <section className="story-section section-wrap">
         <div className="story-copy"><p className="eyebrow">Jardin Secret</p><h2>Не просто витрина.<br /><em>Ваш проводник.</em></h2><p>Подбираем аромат под характер, сезон и повод. Отвечаем на вопросы до покупки и остаёмся рядом после неё.</p><a className="button button--light" href="https://t.me/jardinmanager" target="_blank" rel="noreferrer"><Send size={16} />Получить подборку</a></div>

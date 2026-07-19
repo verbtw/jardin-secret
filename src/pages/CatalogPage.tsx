@@ -5,6 +5,7 @@ import { ProductGrid } from '../components/ProductGrid';
 import { getProducts } from '../data/catalog';
 import { filterProducts, type CatalogQuery, type CatalogSort } from '../domain/catalog';
 import type { ProductAvailability, ProductGender } from '../types/product';
+import { useCart } from '../hooks/useCart';
 
 const allProducts = getProducts();
 const brands = [...new Set(allProducts.map((product) => product.brand))].sort((a, b) => a.localeCompare(b));
@@ -21,6 +22,7 @@ function queryFromParams(params: URLSearchParams): CatalogQuery {
 
 export function CatalogPage() {
   const [params, setParams] = useSearchParams();
+  const { add } = useCart();
   const query = queryFromParams(params);
   const products = useMemo(() => filterProducts(allProducts, query), [params.toString()]);
 
@@ -43,7 +45,7 @@ export function CatalogPage() {
       </header>
       <CatalogControls query={query} brands={brands} onChange={update} onReset={() => setParams({}, { replace: true })} />
       <p className="result-count" aria-live="polite">Найдено: {products.length}</p>
-      <ProductGrid products={products} onReset={() => setParams({}, { replace: true })} />
+      <ProductGrid products={products} onReset={() => setParams({}, { replace: true })} onAdd={add} />
     </main>
   );
 }

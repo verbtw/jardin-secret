@@ -2,6 +2,9 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { CatalogPage } from './pages/CatalogPage';
 import { HomePage } from './pages/HomePage';
+import { ProductPage } from './pages/ProductPage';
+import { CartPage } from './pages/CartPage';
+import { CartProvider } from './hooks/useCart';
 
 function Placeholder({ title }: { title: string }) {
   return <main><h1>{title}</h1></main>;
@@ -9,14 +12,14 @@ function Placeholder({ title }: { title: string }) {
 
 export function App() {
   return (
-    <BrowserRouter>
+    <CartProvider><BrowserRouter>
       <Routes><Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/catalog" element={<CatalogPage />} />
-        <Route path="/product/:slug" element={<Placeholder title="Аромат" />} />
-        <Route path="/cart" element={<Placeholder title="Корзина" />} />
+        <Route path="/product/:slug" element={<ProductPage />} />
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<Placeholder title="Оформление" />} />
       </Route></Routes>
-    </BrowserRouter>
+    </BrowserRouter></CartProvider>
   );
 }

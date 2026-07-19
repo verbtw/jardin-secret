@@ -1,11 +1,13 @@
 import { Menu, ShoppingBag, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
+import { useCart } from '../hooks/useCart';
 
 const navigation = [{ to: '/catalog', label: 'Каталог' }, { to: '/#original', label: 'Оригинальность' }, { to: '/#delivery', label: 'Доставка' }, { to: '/#contacts', label: 'Контакты' }];
 
 export function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { itemCount } = useCart();
   return (
     <div className="site-shell">
       <header className="site-header">
@@ -14,7 +16,7 @@ export function Layout() {
           {navigation.map((item) => <NavLink key={item.label} to={item.to} onClick={() => setMenuOpen(false)}>{item.label}</NavLink>)}
         </nav>
         <div className="header-actions">
-          <Link className="cart-link" to="/cart"><ShoppingBag size={18} /><span>Корзина</span><b>0</b></Link>
+          <Link className="cart-link" to="/cart" aria-label={`Корзина, товаров: ${itemCount}`}><ShoppingBag size={18} /><span>Корзина</span><b>{itemCount}</b></Link>
           <button className="menu-toggle" type="button" onClick={() => setMenuOpen((value) => !value)} aria-expanded={menuOpen} aria-label={menuOpen ? 'Закрыть меню' : 'Открыть меню'}>{menuOpen ? <X /> : <Menu />}</button>
         </div>
       </header>
