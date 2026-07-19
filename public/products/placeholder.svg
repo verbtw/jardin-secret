@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 720" role="img" aria-labelledby="title">
+  <title id="title">Jardin Secret perfume</title>
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4e9f1"/><stop offset="1" stop-color="#cadcce"/></linearGradient></defs>
+  <rect width="600" height="720" fill="url(#g)"/>
+  <circle cx="300" cy="330" r="210" fill="#fff" fill-opacity=".26" stroke="#527863" stroke-opacity=".3"/>
+  <path d="M240 220h120v68c0 18 12 30 30 44v218c0 30-24 54-54 54h-72c-30 0-54-24-54-54V332c18-14 30-26 30-44z" fill="#fff" fill-opacity=".32" stroke="#213d2e" stroke-width="3"/>
+  <rect x="258" y="176" width="84" height="62" rx="8" fill="#213d2e"/>
+  <text x="300" y="408" text-anchor="middle" font-family="Georgia,serif" font-size="30" fill="#213d2e">JARDIN</text>
+  <text x="300" y="444" text-anchor="middle" font-family="Georgia,serif" font-size="30" fill="#213d2e">SECRET</text>
+</svg>
