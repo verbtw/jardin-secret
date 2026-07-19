@@ -8,6 +8,10 @@ import { CartProvider } from './hooks/useCart';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { ContactsPage, DeliveryPage, OriginalityPage } from './pages/InformationPages';
 import { AuthProvider } from './auth/AuthProvider';
+import { RegisterPage } from './pages/RegisterPage';
+import { LoginPage } from './pages/LoginPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
 
 function Placeholder({ title }: { title: string }) {
   return <main><h1>{title}</h1></main>;
@@ -25,6 +29,10 @@ export function App() {
         <Route path="/originality" element={<OriginalityPage />} />
         <Route path="/delivery" element={<DeliveryPage />} />
         <Route path="/contacts" element={<ContactsPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
       </Route></Routes>
     </BrowserRouter></CartProvider></AuthProvider>
   );
