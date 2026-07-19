@@ -5,6 +5,7 @@ import { HomePage } from './pages/HomePage';
 import { ProductPage } from './pages/ProductPage';
 import { CartPage } from './pages/CartPage';
 import { CartProvider } from './hooks/useCart';
+import { CheckoutPage } from './pages/CheckoutPage';
 
 function Placeholder({ title }: { title: string }) {
   return <main><h1>{title}</h1></main>;
@@ -18,7 +19,7 @@ export function App() {
         <Route path="/catalog" element={<CatalogPage />} />
         <Route path="/product/:slug" element={<ProductPage />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<Placeholder title="Оформление" />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
       </Route></Routes>
     </BrowserRouter></CartProvider>
   );
