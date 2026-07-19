@@ -1,8 +1,9 @@
 import * as cheerio from 'cheerio';
+import type { AnyNode } from 'domhandler';
 
 export interface TelegramReview { id: string; text: string; publishedAt: string | null; sourcePostId: number; sourceUrl: string; authorLabel: string }
 
-function linesFrom($element: cheerio.Cheerio<cheerio.AnyNode>) {
+function linesFrom($element: cheerio.Cheerio<AnyNode>) {
   const clone = $element.clone();
   clone.find('br').replaceWith('\n');
   return clone.text().split('\n').map((line) => line.replace(/\s+/g, ' ').trim()).filter(Boolean);
