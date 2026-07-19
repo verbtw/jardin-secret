@@ -1,0 +1,7 @@
+import { supabase } from '../lib/supabase';
+export interface CustomerProfile { id: string; name: string; phone: string; city: string; address: string }
+interface ProfileRow { id: string; full_name: string; phone: string; city: string; address: string; updated_at?: string }
+export function profileFromRow(row: ProfileRow): CustomerProfile { return { id: row.id, name: row.full_name, phone: row.phone, city: row.city, address: row.address }; }
+export function profileToRow(profile: CustomerProfile) { return { id: profile.id, full_name: profile.name.trim(), phone: profile.phone.trim(), city: profile.city.trim(), address: profile.address.trim(), updated_at: new Date().toISOString() }; }
+export async function loadProfile(userId: string): Promise<CustomerProfile> { if (!supabase) return { id: userId, name: '', phone: '', city: '', address: '' }; const { data, error } = await supabase.from('profiles').select('id, full_name, phone, city, address, updated_at').eq('id', userId).maybeSingle(); if (error) throw error; return data ? profileFromRow(data as ProfileRow) : { id: userId, name: '', phone: '', city: '', address: '' }; }
+export async function saveProfile(profile: CustomerProfile): Promise<void> { if (!supabase) throw new Error('Supabase auth is not configured'); const { error } = await supabase.from('profiles').upsert(profileToRow(profile), { onConflict: 'id' }); if (error) throw error; }

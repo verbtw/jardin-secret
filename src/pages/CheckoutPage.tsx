@@ -1,21 +1,28 @@
 import { Check, Clipboard, ExternalLink } from 'lucide-react';
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { getProducts } from '../data/catalog';
 import { getOrderReadiness } from '../domain/catalog';
 import { formatOrder, validateCheckout, type CheckoutErrors, type CheckoutValues } from '../domain/order';
 import { useCart } from '../hooks/useCart';
+import { useAuth } from '../auth/AuthProvider';
+import { loadProfile } from '../auth/profile-service';
 
 const initialValues: CheckoutValues = { name: '', phone: '', city: '', address: '', delivery: '', comment: '' };
 const products = getProducts();
 
 export function CheckoutPage() {
   const { lines } = useCart();
+  const { user } = useAuth();
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState<CheckoutErrors>({});
   const [orderText, setOrderText] = useState('');
   const [copyStatus, setCopyStatus] = useState<'copied' | 'blocked' | ''>('');
   const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (!user) return;
+    loadProfile(user.id).then((profile) => setValues((current) => Object.values(current).some(Boolean) ? current : { ...current, name: profile.name, phone: profile.phone, city: profile.city, address: profile.address })).catch(() => undefined);
+  }, [user]);
   if (!lines.length) return <main className="empty-page"><p className="eyebrow">Оформление</p><h1>Сначала выберите аромат</h1><Link className="button" to="/catalog">Открыть каталог</Link></main>;
   const blockedProducts = lines
     .map((line) => products.find((product) => product.id === line.productId))
