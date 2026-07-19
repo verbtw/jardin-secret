@@ -2,6 +2,7 @@ import { Check, Clipboard, ExternalLink } from 'lucide-react';
 import { useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { getProducts } from '../data/catalog';
+import { getOrderReadiness } from '../domain/catalog';
 import { formatOrder, validateCheckout, type CheckoutErrors, type CheckoutValues } from '../domain/order';
 import { useCart } from '../hooks/useCart';
 
@@ -16,6 +17,14 @@ export function CheckoutPage() {
   const [copyStatus, setCopyStatus] = useState<'copied' | 'blocked' | ''>('');
   const formRef = useRef<HTMLFormElement>(null);
   if (!lines.length) return <main className="empty-page"><p className="eyebrow">Оформление</p><h1>Сначала выберите аромат</h1><Link className="button" to="/catalog">Открыть каталог</Link></main>;
+  const blockedProducts = lines
+    .map((line) => products.find((product) => product.id === line.productId))
+    .filter((product): product is (typeof products)[number] => Boolean(product && !getOrderReadiness(product).ready));
+  if (blockedProducts.length) {
+    const missing = new Set(blockedProducts.flatMap((product) => getOrderReadiness(product).missing));
+    const fields = [...missing].map((item) => item === 'price' ? 'цену' : 'объём').join(' и ');
+    return <main className="empty-page"><p className="eyebrow">Нужно подтверждение</p><h1>Сначала уточните детали</h1><p>Перед оформлением менеджер должен подтвердить {fields} выбранного аромата.</p><div className="detail-actions"><a className="button" href="https://t.me/jardinmanager" target="_blank" rel="noreferrer">Написать менеджеру</a><Link className="button button--outline" to="/cart">Вернуться в корзину</Link></div></main>;
+  }
 
   function change(field: keyof CheckoutValues, value: string) {
     setValues((current) => ({ ...current, [field]: value }));

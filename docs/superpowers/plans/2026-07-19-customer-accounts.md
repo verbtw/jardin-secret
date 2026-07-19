@@ -350,3 +350,59 @@ Expected: unit/component suite, TypeScript/Vite build, desktop E2E, and mobile E
 git add .env.example tests/storefront.spec.ts README.md
 git commit -m "test: verify customer account flow"
 ```
+
+### Task 6: Block checkout until price and volume are known
+
+**Files:**
+- Modify: `src/domain/catalog.ts`
+- Test: `src/domain/catalog.test.ts`
+- Modify: `src/components/ProductCard.tsx`
+- Modify: `src/pages/ProductPage.tsx`
+- Modify: `src/pages/CartPage.tsx`
+- Test: `src/pages/CartPage.test.tsx`
+- Modify: `src/pages/CheckoutPage.tsx`
+
+**Interfaces:**
+- Produces: `getOrderReadiness(product): { ready: boolean; missing: ('price' | 'volume')[] }`.
+- Consumes: `priceRub` and `volumeMl` from each product.
+
+- [ ] **Step 1: Write the failing readiness test**
+
+```ts
+it('requires both a price and a volume before checkout', () => {
+  expect(getOrderReadiness({ priceRub: null, volumeMl: null } as Product)).toEqual({ ready: false, missing: ['price', 'volume'] });
+  expect(getOrderReadiness({ priceRub: 12000, volumeMl: 100 } as Product)).toEqual({ ready: true, missing: [] });
+});
+```
+
+- [ ] **Step 2: Run and confirm RED**
+
+Run: `npm test -- src/domain/catalog.test.ts --run`
+
+Expected: FAIL because `getOrderReadiness` does not exist.
+
+- [ ] **Step 3: Implement the shared rule**
+
+```ts
+export function getOrderReadiness(product: Pick<Product, 'priceRub' | 'volumeMl'>) {
+  const missing: Array<'price' | 'volume'> = [];
+  if (product.priceRub == null) missing.push('price');
+  if (product.volumeMl == null) missing.push('volume');
+  return { ready: missing.length === 0, missing };
+}
+```
+
+- [ ] **Step 4: Apply the rule to every order entry point**
+
+Product cards and product pages replace add-to-cart with a Telegram manager link when not ready. Cart lists `Уточните цену`, `Уточните объём`, or both and disables the checkout link. Checkout rejects a direct URL when any current cart product is not ready and offers manager contact plus return-to-cart actions.
+
+- [ ] **Step 5: Verify and commit**
+
+Run: `npm test -- src/domain/catalog.test.ts src/pages/CartPage.test.tsx src/pages/CheckoutPage.test.tsx --run`
+
+Expected: readiness, cart, and direct-checkout tests PASS.
+
+```bash
+git add src/domain/catalog.ts src/domain/catalog.test.ts src/components/ProductCard.tsx src/pages/ProductPage.tsx src/pages/CartPage.tsx src/pages/CartPage.test.tsx src/pages/CheckoutPage.tsx src/pages/CheckoutPage.test.tsx
+git commit -m "feat: require confirmed price and volume for checkout"
+```

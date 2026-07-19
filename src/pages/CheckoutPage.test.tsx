@@ -22,3 +22,13 @@ it('keeps a selectable order when clipboard access is denied', async () => {
   expect((screen.getByRole('textbox', { name: 'Готовый текст заказа' }) as HTMLTextAreaElement).value).toContain('Стоимость и наличие подтвердит менеджер.');
   expect(screen.getByRole('link', { name: 'Открыть @jardinmanager' })).toHaveAttribute('href', 'https://t.me/jardinmanager');
 });
+
+it('blocks a direct checkout URL when product details need confirmation', () => {
+  window.localStorage.setItem('jardin-secret-cart-v1', JSON.stringify([{ productId: '1755-clive-christian-strange-heavens-out-of-the-blue', quantity: 1 }]));
+  window.history.pushState({}, '', '/checkout');
+  render(<App />);
+  expect(screen.getByRole('heading', { name: 'Сначала уточните детали' })).toBeVisible();
+  expect(screen.getByText(/объём/)).toBeVisible();
+  expect(screen.getByRole('link', { name: 'Написать менеджеру' })).toHaveAttribute('href', 'https://t.me/jardinmanager');
+  expect(screen.queryByRole('button', { name: 'Сформировать заказ' })).not.toBeInTheDocument();
+});

@@ -12,6 +12,15 @@ export interface CatalogQuery {
   sort?: CatalogSort;
 }
 
+export type MissingOrderDetail = 'price' | 'volume';
+
+export function getOrderReadiness(product: Pick<Product, 'priceRub' | 'volumeMl'>): { ready: boolean; missing: MissingOrderDetail[] } {
+  const missing: MissingOrderDetail[] = [];
+  if (product.priceRub == null) missing.push('price');
+  if (product.volumeMl == null) missing.push('volume');
+  return { ready: missing.length === 0, missing };
+}
+
 export function filterProducts(products: Product[], query: CatalogQuery): Product[] {
   const search = query.search?.trim().toLocaleLowerCase('ru-RU') ?? '';
   const filtered = products.filter((product) => {

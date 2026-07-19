@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { filterProducts } from './catalog';
+import { filterProducts, getOrderReadiness } from './catalog';
 import type { Product } from '../types/product';
 
 const products = [
@@ -18,5 +18,13 @@ describe('filterProducts', () => {
 
   it('sorts unknown prices after known prices', () => {
     expect(filterProducts(products, { sort: 'price-asc' }).map((product) => product.id)).toEqual(['1', '2']);
+  });
+});
+
+describe('getOrderReadiness', () => {
+  it('requires both a price and a volume before checkout', () => {
+    expect(getOrderReadiness({ priceRub: null, volumeMl: null })).toEqual({ ready: false, missing: ['price', 'volume'] });
+    expect(getOrderReadiness({ priceRub: 12000, volumeMl: null })).toEqual({ ready: false, missing: ['volume'] });
+    expect(getOrderReadiness({ priceRub: 12000, volumeMl: 100 })).toEqual({ ready: true, missing: [] });
   });
 });

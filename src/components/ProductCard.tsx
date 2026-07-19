@@ -1,10 +1,12 @@
 import { ExternalLink, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getOrderReadiness } from '../domain/catalog';
 import type { Product } from '../types/product';
 
 const rubles = new Intl.NumberFormat('ru-RU');
 
 export function ProductCard({ product, onAdd }: { product: Product; onAdd?: (productId: string) => void }) {
+  const orderReadiness = getOrderReadiness(product);
   return (
     <article className="product-card" data-testid="product-card">
       <Link className="product-card__image" to={`/product/${product.slug}`} aria-label={`${product.brand} ${product.name}`}>
@@ -17,7 +19,8 @@ export function ProductCard({ product, onAdd }: { product: Product; onAdd?: (pro
         <p className="product-card__meta">{product.volumeMl ? `${product.volumeMl} мл` : 'Объём уточнить'}</p>
         <div className="product-card__bottom">
           <strong>{product.priceRub ? `${rubles.format(product.priceRub)} ₽` : 'Уточнить'}</strong>
-          {onAdd && <button className="icon-button" type="button" onClick={() => onAdd(product.id)} aria-label={`Добавить ${product.name} в корзину`}><Plus size={18} /></button>}
+          {onAdd && orderReadiness.ready && <button className="icon-button" type="button" onClick={() => onAdd(product.id)} aria-label={`Добавить ${product.name} в корзину`}><Plus size={18} /></button>}
+          {onAdd && !orderReadiness.ready && <a className="icon-button" href="https://t.me/jardinmanager" target="_blank" rel="noreferrer" aria-label={`Уточнить цену и объём ${product.name} у менеджера`}><ExternalLink size={16} /></a>}
         </div>
       </div>
     </article>
