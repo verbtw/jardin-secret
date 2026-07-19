@@ -7,6 +7,7 @@ import { CartPage } from './pages/CartPage';
 import { CartProvider } from './hooks/useCart';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { ContactsPage, DeliveryPage, OriginalityPage } from './pages/InformationPages';
+import { AuthProvider } from './auth/AuthProvider';
 
 function Placeholder({ title }: { title: string }) {
   return <main><h1>{title}</h1></main>;
@@ -14,7 +15,7 @@ function Placeholder({ title }: { title: string }) {
 
 export function App() {
   return (
-    <CartProvider><BrowserRouter>
+    <AuthProvider><CartProvider><BrowserRouter>
       <Routes><Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/catalog" element={<CatalogPage />} />
@@ -25,6 +26,6 @@ export function App() {
         <Route path="/delivery" element={<DeliveryPage />} />
         <Route path="/contacts" element={<ContactsPage />} />
       </Route></Routes>
-    </BrowserRouter></CartProvider>
+    </BrowserRouter></CartProvider></AuthProvider>
   );
 }
