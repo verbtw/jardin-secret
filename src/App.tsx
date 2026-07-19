@@ -15,6 +15,7 @@ import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { AccountPage } from './pages/AccountPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ReviewsPage } from './pages/ReviewsPage';
+import { OrderReviewPage } from './pages/OrderReviewPage';
 
 function Placeholder({ title }: { title: string }) {
   return <main><h1>{title}</h1></main>;
@@ -38,6 +39,7 @@ export function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
         <Route path="/reviews" element={<ReviewsPage />} />
+        <Route path="/account/orders/:orderId/review" element={<ProtectedRoute><OrderReviewPage /></ProtectedRoute>} />
       </Route></Routes>
     </BrowserRouter></CartProvider></AuthProvider>
   );

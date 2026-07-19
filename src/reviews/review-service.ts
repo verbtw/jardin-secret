@@ -1,5 +1,6 @@
 import telegramData from '../data/telegram-reviews.json';
 import { supabase } from '../lib/supabase';
+import type { ReviewDraft } from './review-types';
 
 export interface PublicReview { id: string; source: 'telegram' | 'website'; authorLabel: string; text: string; rating: number | null; publishedAt: string | null; sourceUrl: string | null; productId: string | null }
 
@@ -11,4 +12,10 @@ export async function loadPublicReviews(): Promise<PublicReview[]> {
   if (error) return telegram;
   const website: PublicReview[] = (data ?? []).map((row) => ({ id: row.id, source: 'website', authorLabel: 'Покупатель Jardin Secret', text: row.body, rating: row.rating, publishedAt: row.created_at, sourceUrl: null, productId: row.product_id }));
   return mergeReviews(telegram, website);
+}
+
+export async function submitReview(userId: string, orderId: string, draft: ReviewDraft): Promise<void> {
+  if (!supabase) throw new Error('Supabase auth is not configured');
+  const { error } = await supabase.from('reviews').insert({ user_id: userId, order_id: orderId, product_id: draft.productId || null, rating: draft.rating, body: draft.text.trim(), status: 'pending' });
+  if (error) throw error;
 }

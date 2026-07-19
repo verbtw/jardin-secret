@@ -1,0 +1,16 @@
+import { useEffect, useState, type FormEvent } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { useAuth } from '../auth/AuthProvider';
+import { loadOrders, type CustomerOrder } from '../orders/order-service';
+import { submitReview } from '../reviews/review-service';
+import { validateReview, type ReviewErrors } from '../reviews/review-types';
+
+export function OrderReviewPage() {
+  const { user } = useAuth(); const { orderId } = useParams(); const [order, setOrder] = useState<CustomerOrder | null | undefined>(undefined); const [rating, setRating] = useState(0); const [text, setText] = useState(''); const [productId, setProductId] = useState(''); const [errors, setErrors] = useState<ReviewErrors>({}); const [status, setStatus] = useState('');
+  useEffect(() => { if (user) loadOrders(user.id).then((orders) => setOrder(orders.find((item) => item.id === orderId) ?? null)); }, [orderId, user]);
+  if (order === undefined) return <main className="empty-page"><p className="eyebrow">Отзыв</p><h1>Проверяем заказ…</h1></main>;
+  if (!order) return <main className="empty-page"><p className="eyebrow">Отзыв</p><h1>Заказ не найден</h1><Link className="button" to="/account">Вернуться в кабинет</Link></main>;
+  if (order.status !== 'completed') return <main className="empty-page"><p className="eyebrow">Заказ {order.publicCode}</p><h1>Отзыв пока закрыт</h1><p>Отзыв можно оставить после выполнения заказа.</p><Link className="button" to="/account">Вернуться в кабинет</Link></main>;
+  async function submit(event: FormEvent) { event.preventDefault(); if (!user || !order) return; const next = validateReview({ rating, text, productId: productId || null }); setErrors(next); if (Object.keys(next).length) return; try { await submitReview(user.id, order.id, { rating, text, productId: productId || null }); setStatus('Спасибо! Отзыв появится после модерации.'); } catch { setStatus('Не удалось отправить отзыв. Проверьте, что заказ выполнен и отзыв ещё не оставлен.'); } }
+  return <main className="page review-form-page"><header className="page-heading"><p className="eyebrow">Заказ {order.publicCode}</p><h1>Поделитесь впечатлением</h1><p>Расскажите об аромате и сервисе. Отзыв появится на сайте после модерации.</p></header><form className="review-form" onSubmit={submit}><fieldset><legend>Ваша оценка</legend><div className="rating-input">{[1,2,3,4,5].map((value) => <label key={value}><input type="radio" name="rating" value={value} checked={rating === value} onChange={() => setRating(value)} /><span aria-label={`${value} из 5`}>★</span></label>)}</div>{errors.rating && <small>{errors.rating}</small>}</fieldset><label className="field"><span>Аромат из заказа</span><select value={productId} onChange={(event) => setProductId(event.target.value)}><option value="">Весь заказ и сервис</option>{order.items.map((item) => <option value={item.productId} key={item.productId}>{item.name}</option>)}</select></label><label className="field"><span>Текст отзыва</span><textarea value={text} onChange={(event) => setText(event.target.value)} rows={8} maxLength={1500} /><small>{errors.text ?? `${text.length} / 1500`}</small></label><button className="button" type="submit">Отправить отзыв</button><p className="auth-status" aria-live="polite">{status}</p></form></main>;
+}
