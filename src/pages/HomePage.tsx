@@ -5,8 +5,11 @@ import { ProductGrid } from '../components/ProductGrid';
 import { TrustStrip } from '../components/TrustStrip';
 import { getProducts } from '../data/catalog';
 import { useCart } from '../hooks/useCart';
+import { ReviewsSection } from '../components/ReviewsSection';
+import { getTelegramReviews } from '../reviews/review-service';
 
 const products = getProducts();
+const reviews = getTelegramReviews();
 
 export function HomePage() {
   const { add } = useCart();
@@ -22,6 +25,7 @@ export function HomePage() {
         <div className="story-copy"><p className="eyebrow">Jardin Secret</p><h2>Не просто витрина.<br /><em>Ваш проводник.</em></h2><p>Подбираем аромат под характер, сезон и повод. Отвечаем на вопросы до покупки и остаёмся рядом после неё.</p><a className="button button--light" href="https://t.me/jardinmanager" target="_blank" rel="noreferrer"><Send size={16} />Получить подборку</a></div>
         <div className="story-numbers"><div><strong>4 000+</strong><span>читателей канала</span></div><div><strong>1 259</strong><span>публикаций изучено</span></div><div><strong>114</strong><span>ароматов в каталоге</span></div><div><strong>РФ + СНГ</strong><span>география доставки</span></div></div>
       </section>
+      <ReviewsSection reviews={reviews} limit={6} />
       <section className="delivery-section section-wrap" id="delivery"><div><p className="eyebrow">Доставка</p><h2>Бережно упакуем.<br /><em>Доставим к вам.</em></h2></div><div><p>Отправляем оригинальную парфюмерию по России и странам СНГ. Сроки и стоимость зависят от города — менеджер рассчитает лучший вариант.</p><a className="text-link" href="https://t.me/jardinmanager" target="_blank" rel="noreferrer">Узнать условия <ArrowRight size={16} /></a></div></section>
     </main>
   );

@@ -14,6 +14,7 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { AccountPage } from './pages/AccountPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { ReviewsPage } from './pages/ReviewsPage';
 
 function Placeholder({ title }: { title: string }) {
   return <main><h1>{title}</h1></main>;
@@ -36,6 +37,7 @@ export function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
+        <Route path="/reviews" element={<ReviewsPage />} />
       </Route></Routes>
     </BrowserRouter></CartProvider></AuthProvider>
   );

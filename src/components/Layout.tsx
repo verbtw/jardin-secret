@@ -4,7 +4,7 @@ import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { useAuth } from '../auth/AuthProvider';
 
-const navigation = [{ to: '/catalog', label: 'Каталог' }, { to: '/originality', label: 'Оригинальность' }, { to: '/delivery', label: 'Доставка' }, { to: '/contacts', label: 'Контакты' }];
+const navigation = [{ to: '/catalog', label: 'Каталог' }, { to: '/originality', label: 'Оригинальность' }, { to: '/delivery', label: 'Доставка' }, { to: '/reviews', label: 'Отзывы' }, { to: '/contacts', label: 'Контакты' }];
 
 export function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);

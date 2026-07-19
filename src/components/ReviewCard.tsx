@@ -1,0 +1,5 @@
+import { ExternalLink } from 'lucide-react';
+import type { PublicReview } from '../reviews/review-service';
+
+const dateFormat = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+export function ReviewCard({ review }: { review: PublicReview }) { return <article className="review-card"><div className="review-card__top"><span>{review.source === 'telegram' ? 'Из Telegram' : 'С сайта'}</span>{review.rating && <span className="review-stars" aria-label={`Оценка ${review.rating} из 5`}>{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>}</div><blockquote>{review.text}</blockquote><div className="review-card__footer"><div><strong>{review.authorLabel}</strong><time dateTime={review.publishedAt ?? undefined}>{review.publishedAt ? dateFormat.format(new Date(review.publishedAt)) : ''}</time></div>{review.sourceUrl && <a href={review.sourceUrl} target="_blank" rel="noreferrer" aria-label="Открыть отзыв в Telegram"><ExternalLink size={16} /></a>}</div></article>; }
