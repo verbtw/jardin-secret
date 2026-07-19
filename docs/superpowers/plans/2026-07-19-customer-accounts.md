@@ -406,3 +406,55 @@ Expected: readiness, cart, and direct-checkout tests PASS.
 git add src/domain/catalog.ts src/domain/catalog.test.ts src/components/ProductCard.tsx src/pages/ProductPage.tsx src/pages/CartPage.tsx src/pages/CartPage.test.tsx src/pages/CheckoutPage.tsx src/pages/CheckoutPage.test.tsx
 git commit -m "feat: require confirmed price and volume for checkout"
 ```
+
+### Task 7: Replace homepage anchors with useful information pages
+
+**Files:**
+- Create: `src/pages/InformationPages.tsx`
+- Test: `src/pages/InformationPages.test.tsx`
+- Modify: `src/App.tsx`
+- Modify: `src/components/Layout.tsx`
+- Modify: `src/styles.css`
+
+**Interfaces:**
+- Produces: `/originality`, `/delivery`, and `/contacts`.
+- Consumes: existing Telegram contact URLs and checkout delivery methods.
+
+- [ ] **Step 1: Write failing route tests**
+
+```tsx
+it.each([
+  ['/originality', 'Только оригинальная парфюмерия'],
+  ['/delivery', 'Доставка по России и СНГ'],
+  ['/contacts', 'Мы на связи'],
+])('renders %s as a real information page', (path, heading) => {
+  window.history.pushState({}, '', path);
+  render(<App />);
+  expect(screen.getByRole('heading', { name: heading })).toBeVisible();
+});
+```
+
+- [ ] **Step 2: Run and confirm RED**
+
+Run: `npm test -- src/pages/InformationPages.test.tsx --run`
+
+Expected: FAIL because the routes do not exist.
+
+- [ ] **Step 3: Implement the three pages**
+
+Use one shared editorial layout with distinct content. Originality offers pre-payment packaging/batch-code questions; delivery lists СДЭК, Почта России, courier, РФ/СНГ and manager-confirmed cost/time; contacts exposes manager, channel, reviews, collaboration, and creator credit.
+
+- [ ] **Step 4: Replace navigation anchors**
+
+Change links to exact routes `/originality`, `/delivery`, `/contacts`. Keep `NavLink` active styling and close the mobile menu on selection.
+
+- [ ] **Step 5: Verify and commit**
+
+Run: `npm test -- src/pages/InformationPages.test.tsx src/pages/HomePage.test.tsx --run && npm run build`
+
+Expected: all information page tests PASS and build exits 0.
+
+```bash
+git add src/pages/InformationPages.tsx src/pages/InformationPages.test.tsx src/App.tsx src/components/Layout.tsx src/styles.css docs/superpowers
+git commit -m "feat: add useful store information pages"
+```

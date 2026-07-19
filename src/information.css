@@ -1,0 +1,26 @@
+.info-hero { min-height: 390px; display: flex; flex-direction: column; justify-content: flex-end; }
+.info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border-block: 1px solid var(--line); }
+.info-card { background: var(--milk); padding: clamp(38px, 5vw, 72px); }
+.info-card__icon { width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; margin-bottom: 42px; }
+.info-card__icon svg { width: 21px; stroke-width: 1.4; }
+.info-card h2, .info-action h2 { font: 500 clamp(31px, 3vw, 45px)/.95 var(--display); margin: 0; }
+.info-card p, .info-action p { font-size: 13px; line-height: 1.75; color: #607268; margin: 20px 0 0; }
+.info-action { background: var(--deep); color: #edf4ef; padding: clamp(55px, 7vw, 90px) clamp(20px, 6vw, 92px); display: flex; align-items: flex-end; justify-content: space-between; gap: 50px; }
+.info-action > div { max-width: 650px; }
+.info-action p:not(.eyebrow) { color: #adbbb1; }
+.contact-directory { padding: clamp(50px, 7vw, 90px) clamp(20px, 6vw, 92px); }
+.contact-directory__item { display: grid; grid-template-columns: 1fr 1fr auto; align-items: center; gap: 20px; padding: 29px 0; border-bottom: 1px solid var(--line); }
+.contact-directory__item:first-child { border-top: 1px solid var(--line); }
+.contact-directory__item span { font-size: 12px; color: #6a7a70; }
+.contact-directory__item strong { font: 500 clamp(24px, 3vw, 40px) var(--display); }
+.contact-directory__item svg { width: 20px; transition: transform .2s; }
+.contact-directory__item:hover svg { transform: translate(3px, -3px); }
+.creator-note { margin: 0; padding: 0 clamp(20px, 6vw, 92px) 80px; font: 500 9px var(--mono); letter-spacing: .09em; text-transform: uppercase; color: #74857a; }
+@media (max-width: 760px) {
+  .info-grid { grid-template-columns: 1fr; }
+  .info-card__icon { margin-bottom: 25px; }
+  .info-action { align-items: flex-start; flex-direction: column; }
+  .contact-directory__item { grid-template-columns: 1fr auto; }
+  .contact-directory__item strong { grid-column: 1/2; }
+  .contact-directory__item svg { grid-column: 2; grid-row: 1/3; }
+}
