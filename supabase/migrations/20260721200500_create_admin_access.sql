@@ -24,6 +24,17 @@ revoke all on function private.is_admin() from public, anon, authenticated;
 grant usage on schema private to authenticated;
 grant execute on function private.is_admin() to authenticated;
 
+create function public.current_user_is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$ select private.is_admin(); $$;
+
+revoke all on function public.current_user_is_admin() from public, anon, authenticated;
+grant execute on function public.current_user_is_admin() to authenticated;
+
 create policy products_admin_read
 on public.products for select
 to authenticated

@@ -7,13 +7,14 @@ const navigation = [{ to: '/catalog', label: 'Каталог' }, { to: '/origina
 
 export function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   return (
     <div className="site-shell">
       <header className="site-header">
         <Link className="wordmark" to="/" aria-label="Jardin Secret — главная"><span>Jardin</span><span>Secret</span></Link>
         <nav className={`main-nav ${menuOpen ? 'main-nav--open' : ''}`} aria-label="Основная навигация">
           {navigation.map((item) => <NavLink key={item.label} to={item.to} onClick={() => setMenuOpen(false)}>{item.label}</NavLink>)}
+          {isAdmin && <NavLink to="/admin" onClick={() => setMenuOpen(false)}>Управление</NavLink>}
         </nav>
         <div className="header-actions">
           <Link className="cart-link account-link" to={user ? '/account' : '/login'} aria-label={user ? 'Открыть профиль' : 'Войти в аккаунт'}><CircleUserRound size={18} /><span>{user ? 'Профиль' : 'Войти'}</span></Link>

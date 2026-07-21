@@ -10,6 +10,7 @@ import './reviews.css';
 import './review-card-footer.css';
 import './review-form.css';
 import './account-orders.css';
+import './admin.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode><App /></StrictMode>,

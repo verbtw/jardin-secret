@@ -13,6 +13,7 @@ import { AccountPage } from './pages/AccountPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ReviewsPage } from './pages/ReviewsPage';
 import { OrderReviewPage } from './pages/OrderReviewPage';
+import { AdminPage } from './pages/AdminPage';
 
 function Placeholder({ title }: { title: string }) {
   return <main><h1>{title}</h1></main>;
@@ -37,6 +38,7 @@ export function App() {
         <Route path="/account" element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
         <Route path="/reviews" element={<ReviewsPage />} />
         <Route path="/account/orders/:orderId/review" element={<ProtectedRoute><OrderReviewPage /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
       </Route></Routes>
     </BrowserRouter></AuthProvider>
   );
