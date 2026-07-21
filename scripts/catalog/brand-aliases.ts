@@ -1,4 +1,4 @@
-export const brandAliases: ReadonlyArray<readonly [alias: string, canonical: string]> = [
+const aliases = [
   ['Maison Francis Kurkdjian', 'Maison Francis Kurkdjian'],
   ['Jean Paul Gaultier', 'Jean Paul Gaultier'],
   ['Initio Parfums Privés', 'Initio Parfums Privés'],
@@ -36,5 +36,6 @@ export const brandAliases: ReadonlyArray<readonly [alias: string, canonical: str
   ['Sospiro', 'Sospiro'],
   ['Versace', 'Versace'],
   ['Xerjoff', 'Xerjoff'],
-].sort((a, b) => b[0].length - a[0].length);
+] satisfies ReadonlyArray<readonly [alias: string, canonical: string]>;
 
+export const brandAliases = [...aliases].sort((a, b) => b[0].length - a[0].length);
