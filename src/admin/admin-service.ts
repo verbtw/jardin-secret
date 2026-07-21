@@ -66,6 +66,15 @@ export interface AdminReview {
   created_at: string;
 }
 
+export interface AdminImportReviewRow {
+  id: string;
+  supplier_code: string;
+  source_row: string;
+  cost_rub: number;
+  parse_reason: string;
+  observed_at: string;
+}
+
 interface RpcClient {
   rpc(name: string): PromiseLike<{data: AdminProduct[] | null; error: {message: string} | null}>;
 }
@@ -128,4 +137,10 @@ export async function loadAdminReviews(): Promise<AdminReview[]> {
 export async function setAdminReviewStatus(id: string, status: AdminReview['status']) {
   const {error} = await configuredClient().from('reviews').update({status}).eq('id', id);
   if (error) throw new Error('Не удалось обновить отзыв');
+}
+
+export async function loadAdminImportReview(): Promise<AdminImportReviewRow[]> {
+  const {data, error} = await configuredClient().rpc('admin_import_review');
+  if (error) throw new Error('Не удалось загрузить строки на проверку');
+  return (data ?? []) as AdminImportReviewRow[];
 }

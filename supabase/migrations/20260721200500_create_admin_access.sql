@@ -171,3 +171,33 @@ $$;
 
 revoke all on function public.admin_catalog_dashboard() from public, anon, authenticated;
 grant execute on function public.admin_catalog_dashboard() to authenticated;
+
+create function public.admin_import_review()
+returns table (
+  id uuid,
+  supplier_code text,
+  source_row text,
+  cost_rub integer,
+  parse_reason text,
+  observed_at timestamptz
+)
+language plpgsql
+stable
+security definer
+set search_path = ''
+as $$
+begin
+  if not private.is_admin() then
+    raise exception 'insufficient_privilege' using errcode = '42501';
+  end if;
+  return query
+  select o.id, o.supplier_code, o.source_row, o.cost_rub, o.parse_reason, o.observed_at
+  from private.supplier_offers o
+  where o.parse_status = 'review'
+  order by o.observed_at desc
+  limit 1000;
+end;
+$$;
+
+revoke all on function public.admin_import_review() from public, anon, authenticated;
+grant execute on function public.admin_import_review() to authenticated;

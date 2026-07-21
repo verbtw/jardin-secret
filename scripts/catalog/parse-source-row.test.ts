@@ -2,6 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { parseSourceRow } from './parse-source-row';
 
 describe('parseSourceRow', () => {
+  it('normalizes common abbreviated supplier brands', () => {
+    expect(parseSourceRow('a. banderas blue seduction m edt 100ml')).toMatchObject({
+      kind: 'fragrance', brand: 'Antonio Banderas', name: 'blue seduction', concentration: 'EDT', volumeMl: 100,
+    });
+    expect(parseSourceRow('d&g light blue edt 50ml')).toMatchObject({
+      kind: 'fragrance', brand: 'Dolce & Gabbana', name: 'light blue', concentration: 'EDT', volumeMl: 50,
+    });
+  });
   it('parses a full-size EDP fragrance variant', () => {
     expect(parseSourceRow('Tom Ford Oud Wood edp 50ml')).toEqual({
       kind: 'fragrance',

@@ -62,6 +62,7 @@ export function parseSourceRow(sourceRow: string): ParseResult {
     .replace(new RegExp(concentrationPatterns, 'ig'), ' ')
     .replace(/\d+(?:[.,]\d+)?\s*(?:ml|мл)(?=$|\s|[,;+()/])/ig, ' ')
     .replace(/\b(?:spray|спрей|natural\s+spray|vaporisateur)\b/ig, ' ')
+    .replace(/(?:^|\s)(?:m|w|u|м|ж)(?=$|\s|[,;+()/])/ig, ' ')
     .replace(/[()[\]{}]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
