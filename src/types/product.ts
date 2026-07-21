@@ -6,6 +6,7 @@ export interface Product {
   slug: string;
   brand: string;
   name: string;
+  concentration?: string | null;
   volumeMl: number | null;
   priceRub: number | null;
   gender: ProductGender;

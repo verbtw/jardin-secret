@@ -1,11 +1,8 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { CatalogPage } from './pages/CatalogPage';
 import { HomePage } from './pages/HomePage';
 import { ProductPage } from './pages/ProductPage';
-import { CartPage } from './pages/CartPage';
-import { CartProvider } from './hooks/useCart';
-import { CheckoutPage } from './pages/CheckoutPage';
 import { ContactsPage, DeliveryPage, OriginalityPage } from './pages/InformationPages';
 import { AuthProvider } from './auth/AuthProvider';
 import { RegisterPage } from './pages/RegisterPage';
@@ -23,13 +20,13 @@ function Placeholder({ title }: { title: string }) {
 
 export function App() {
   return (
-    <AuthProvider><CartProvider><BrowserRouter>
+    <AuthProvider><BrowserRouter>
       <Routes><Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/catalog" element={<CatalogPage />} />
         <Route path="/product/:slug" element={<ProductPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/cart" element={<Navigate to="/catalog" replace />} />
+        <Route path="/checkout" element={<Navigate to="/catalog" replace />} />
         <Route path="/originality" element={<OriginalityPage />} />
         <Route path="/delivery" element={<DeliveryPage />} />
         <Route path="/contacts" element={<ContactsPage />} />
@@ -41,6 +38,6 @@ export function App() {
         <Route path="/reviews" element={<ReviewsPage />} />
         <Route path="/account/orders/:orderId/review" element={<ProtectedRoute><OrderReviewPage /></ProtectedRoute>} />
       </Route></Routes>
-    </BrowserRouter></CartProvider></AuthProvider>
+    </BrowserRouter></AuthProvider>
   );
 }
