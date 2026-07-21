@@ -120,6 +120,14 @@ export async function loadAdminOrders(): Promise<AdminOrder[]> {
   return (data ?? []) as AdminOrder[];
 }
 
+export async function createAdminOrder(userEmail: string, itemName: string): Promise<string> {
+  const {data, error} = await configuredClient().rpc('admin_create_order', {
+    p_user_email: userEmail.trim(), p_item_name: itemName.trim(),
+  });
+  if (error) throw new Error('Покупатель не найден. Сначала ему нужно зарегистрироваться.');
+  return data as string;
+}
+
 export async function setAdminOrderStatus(id: string, status: AdminOrder['status']) {
   const completedAt = status === 'completed' ? new Date().toISOString() : null;
   const {error} = await configuredClient().from('orders').update({status, completed_at: completedAt}).eq('id', id);

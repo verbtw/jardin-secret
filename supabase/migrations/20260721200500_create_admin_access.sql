@@ -201,3 +201,37 @@ $$;
 
 revoke all on function public.admin_import_review() from public, anon, authenticated;
 grant execute on function public.admin_import_review() to authenticated;
+
+create function public.admin_create_order(p_user_email text, p_item_name text)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  target_user_id uuid;
+  generated_code text;
+begin
+  if not private.is_admin() then
+    raise exception 'insufficient_privilege' using errcode = '42501';
+  end if;
+  select id into target_user_id from auth.users where lower(email) = lower(btrim(p_user_email));
+  if target_user_id is null then
+    raise exception 'customer_not_found' using errcode = 'P0002';
+  end if;
+  generated_code := 'JS-' || upper(substr(md5(random()::text || clock_timestamp()::text), 1, 6));
+  insert into public.orders (user_id, public_code, status, items)
+  values (
+    target_user_id,
+    generated_code,
+    'pending',
+    jsonb_build_array(jsonb_build_object(
+      'productId', '', 'name', btrim(p_item_name), 'quantity', 1, 'priceRub', 0
+    ))
+  );
+  return generated_code;
+end;
+$$;
+
+revoke all on function public.admin_create_order(text, text) from public, anon, authenticated;
+grant execute on function public.admin_create_order(text, text) to authenticated;

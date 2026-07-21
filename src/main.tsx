@@ -11,6 +11,7 @@ import './review-card-footer.css';
 import './review-form.css';
 import './account-orders.css';
 import './admin.css';
+import './admin-order.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode><App /></StrictMode>,

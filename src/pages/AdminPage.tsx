@@ -1,6 +1,6 @@
 import {useEffect, useMemo, useState, type FormEvent} from 'react';
 import {
-  loadAdminCatalog, loadAdminImportReview, loadAdminOrders, loadAdminReviews, saveAdminProduct,
+  createAdminOrder, loadAdminCatalog, loadAdminImportReview, loadAdminOrders, loadAdminReviews, saveAdminProduct,
   setAdminOrderStatus, setAdminReviewStatus, type AdminOrder, type AdminProduct,
   type AdminImportReviewRow, type AdminReview,
 } from '../admin/admin-service';
@@ -16,6 +16,8 @@ export function AdminPage() {
   const [selected, setSelected] = useState<AdminProduct | null>(null);
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Загружаем данные…');
+  const [orderEmail, setOrderEmail] = useState('');
+  const [orderItem, setOrderItem] = useState('');
 
   async function refresh() {
     try {
@@ -59,6 +61,14 @@ export function AdminPage() {
     setSelected((current) => current ? {...current, [key]: value} : current);
   }
 
+  async function addOrder(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setStatus('Создаём заказ…');
+    try {
+      const code = await createAdminOrder(orderEmail, orderItem);
+      setOrderEmail(''); setOrderItem(''); setStatus(`Заказ ${code} создан.`); await refresh();
+    } catch (error) { setStatus(error instanceof Error ? error.message : 'Не удалось создать заказ'); }
+  }
+
   return <main className="admin-page">
     <header className="page-heading"><p className="eyebrow">Jardin Secret · управление</p><h1>Админ-панель</h1><p>Каталог, цены, заказы и отзывы в одном месте.</p></header>
     {status && <p className="admin-status" aria-live="polite">{status}</p>}
@@ -76,7 +86,7 @@ export function AdminPage() {
       </div>
     </section>
     <section className="admin-section"><p className="eyebrow">Импорт · требует внимания</p><h2>Неопознанные позиции · {importReview.length}</h2><div className="admin-operations">{importReview.slice(0, 100).map((row) => <article key={row.id}><div><strong>{row.source_row}</strong><small>Поставщик {row.supplier_code} · {money.format(row.cost_rub)} ₽</small></div><span>{row.parse_reason}</span></article>)}</div></section>
-    <section className="admin-section"><p className="eyebrow">Заказы</p><h2>Работа с заказами</h2><div className="admin-operations">{orders.length ? orders.map((order) => <article key={order.id}><div><strong>{order.public_code}</strong><small>{new Date(order.created_at).toLocaleDateString('ru-RU')}</small><p>{order.items.map((item) => item.name).filter(Boolean).join(', ') || 'Состав заказа'}</p></div><select value={order.status} onChange={async (event) => { await setAdminOrderStatus(order.id, event.target.value as AdminOrder['status']); await refresh(); }}><option value="pending">В работе</option><option value="completed">Выполнен</option><option value="cancelled">Отменён</option></select></article>) : <p>Заказов пока нет.</p>}</div></section>
+    <section className="admin-section"><p className="eyebrow">Заказы</p><h2>Работа с заказами</h2><form className="admin-order-form" onSubmit={addOrder}><label className="field"><span>Email покупателя</span><input type="email" required value={orderEmail} onChange={(event) => setOrderEmail(event.target.value)} /></label><label className="field"><span>Что заказали</span><input required value={orderItem} onChange={(event) => setOrderItem(event.target.value)} placeholder="Tom Ford Oud Wood, 50 мл" /></label><button className="button" type="submit">Добавить заказ</button></form><div className="admin-operations">{orders.length ? orders.map((order) => <article key={order.id}><div><strong>{order.public_code}</strong><small>{new Date(order.created_at).toLocaleDateString('ru-RU')}</small><p>{order.items.map((item) => item.name).filter(Boolean).join(', ') || 'Состав заказа'}</p></div><select value={order.status} onChange={async (event) => { await setAdminOrderStatus(order.id, event.target.value as AdminOrder['status']); await refresh(); }}><option value="pending">В работе</option><option value="completed">Выполнен</option><option value="cancelled">Отменён</option></select></article>) : <p>Заказов пока нет.</p>}</div></section>
     <section className="admin-section"><p className="eyebrow">Отзывы</p><h2>Модерация</h2><div className="admin-operations">{reviews.length ? reviews.map((review) => <article key={review.id}><div><strong>{'★'.repeat(review.rating)}</strong><small>{new Date(review.created_at).toLocaleDateString('ru-RU')}</small><p>{review.body}</p></div><select value={review.status} onChange={async (event) => { await setAdminReviewStatus(review.id, event.target.value as AdminReview['status']); await refresh(); }}><option value="pending">На проверке</option><option value="published">Опубликовать</option><option value="rejected">Отклонить</option></select></article>) : <p>Новых отзывов нет.</p>}</div></section>
   </main>;
 }
