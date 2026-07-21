@@ -1,5 +1,5 @@
-import type { SupplierPriceList, SupplierRow } from './eparfume-client';
-import { parseSourceRow } from './parse-source-row';
+import type { SupplierPriceList, SupplierRow } from './eparfume-client.js';
+import { parseSourceRow } from './parse-source-row.js';
 
 export interface CatalogSourceClient {
   login(): Promise<void>;

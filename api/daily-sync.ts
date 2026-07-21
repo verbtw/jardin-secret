@@ -1,9 +1,10 @@
-import {readCatalogImportConfig} from '../scripts/catalog/catalog-env';
-import {EparfumeClient} from '../scripts/catalog/eparfume-client';
-import {runCatalogImport} from '../scripts/catalog/import-catalog';
-import {PostgresCatalogRepository} from '../scripts/catalog/postgres-catalog-repository';
-import {PostgresPricingRepository} from '../scripts/pricing/postgres-pricing-repository';
-import {runDailyPricing} from '../scripts/pricing/run-pricing';
+/// <reference types="node" />
+import {readCatalogImportConfig} from '../scripts/catalog/catalog-env.js';
+import {EparfumeClient} from '../scripts/catalog/eparfume-client.js';
+import {runCatalogImport} from '../scripts/catalog/import-catalog.js';
+import {PostgresCatalogRepository} from '../scripts/catalog/postgres-catalog-repository.js';
+import {PostgresPricingRepository} from '../scripts/pricing/postgres-pricing-repository.js';
+import {runDailyPricing} from '../scripts/pricing/run-pricing.js';
 
 export const config = {maxDuration: 300};
 

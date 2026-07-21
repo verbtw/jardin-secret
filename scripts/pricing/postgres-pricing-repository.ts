@@ -1,5 +1,5 @@
 import postgres, {type Sql} from 'postgres';
-import type {PricingProduct, PricingRepository, StoredPricingDecision} from './run-pricing';
+import type {PricingProduct, PricingRepository, StoredPricingDecision} from './run-pricing.js';
 
 interface PricingRow {
   id: string;

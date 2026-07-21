@@ -1,4 +1,4 @@
-import {calculateRetailPrice, type PricingReason} from '../../src/domain/pricing';
+import {calculateRetailPrice, type PricingReason} from '../../src/domain/pricing.js';
 
 export interface PricingProduct {
   id: string;

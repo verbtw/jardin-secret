@@ -1,5 +1,5 @@
 import postgres, { type Sql } from 'postgres';
-import type { CatalogImportRepository, ImportOffer, ImportProduct, ImportSummary } from './import-catalog';
+import type { CatalogImportRepository, ImportOffer, ImportProduct, ImportSummary } from './import-catalog.js';
 
 export class PostgresCatalogRepository implements CatalogImportRepository {
   private readonly sql: Sql;

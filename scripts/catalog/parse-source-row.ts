@@ -1,5 +1,5 @@
-import { brandAliases } from './brand-aliases';
-import type { FragranceConcentration, ParseResult, ReviewReason } from './catalog-types';
+import { brandAliases } from './brand-aliases.js';
+import type { FragranceConcentration, ParseResult, ReviewReason } from './catalog-types.js';
 
 const nonFragrance = [
   /(?:^|\s)(?:диффузор|свеча|шампунь|крем|лосьон|дезодорант|антиперспирант|гель\s+для\s+душа)(?=$|\s|[,;+()/])/i,
