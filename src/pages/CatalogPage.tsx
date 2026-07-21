@@ -2,12 +2,9 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CatalogControls } from '../components/CatalogControls';
 import { ProductGrid } from '../components/ProductGrid';
-import { getProducts } from '../data/catalog';
 import { filterProducts, type CatalogQuery, type CatalogSort } from '../domain/catalog';
+import { useCatalogProducts } from '../hooks/useCatalogProducts';
 import type { ProductAvailability, ProductGender } from '../types/product';
-
-const allProducts = getProducts();
-const brands = [...new Set(allProducts.map((product) => product.brand))].sort((a, b) => a.localeCompare(b));
 
 function queryFromParams(params: URLSearchParams): CatalogQuery {
   return {
@@ -21,6 +18,11 @@ function queryFromParams(params: URLSearchParams): CatalogQuery {
 
 export function CatalogPage() {
   const [params, setParams] = useSearchParams();
+  const allProducts = useCatalogProducts();
+  const brands = useMemo(
+    () => [...new Set(allProducts.map((product) => product.brand))].sort((a, b) => a.localeCompare(b)),
+    [allProducts],
+  );
   const query = queryFromParams(params);
   const products = useMemo(() => filterProducts(allProducts, query), [params.toString()]);
 
@@ -37,7 +39,7 @@ export function CatalogPage() {
   return (
     <main className="page catalog-page">
       <header className="page-heading">
-        <p className="eyebrow">114 ароматов из нашего Telegram</p>
+        <p className="eyebrow">{allProducts.length} ароматов в каталоге</p>
         <h1>Найдите свой аромат</h1>
         <p>Оригинальная парфюмерия без наценки крупных сетей. Стоимость и наличие подтвердит менеджер.</p>
       </header>

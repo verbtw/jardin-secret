@@ -13,6 +13,13 @@ export interface Product {
   availability: ProductAvailability;
   description: string;
   notes: string[];
+  fragranceFamily?: string | null;
+  topNotes?: string[];
+  heartNotes?: string[];
+  baseNotes?: string[];
+  accords?: string[];
+  perfumers?: string[];
+  launchYear?: number | null;
   imageUrl: string;
   sourceUrl: string;
   sourcePostId: number;
