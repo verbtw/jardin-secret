@@ -10,7 +10,7 @@ export function useCatalogProducts() {
     if (!supabase) return;
     let active = true;
     loadPublicCatalog(supabase).then((next) => {
-      if (active) setProducts(next);
+      if (active && next.length) setProducts(next);
     }).catch(() => {
       // The curated local catalog keeps the storefront usable during a transient API outage.
     });

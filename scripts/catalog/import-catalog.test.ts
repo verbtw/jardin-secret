@@ -7,6 +7,8 @@ class MemoryRepository implements CatalogImportRepository {
   offers = new Map<string, ImportOffer>();
   runs: Array<{id: string; status: string}> = [];
   bulkCalls = 0;
+  bulkOfferCounts: number[] = [];
+  productBulkCalls = 0;
 
   async startRun() { const run = {id: `run-${this.runs.length + 1}`, status: 'running'}; this.runs.push(run); return run.id; }
   async completeRun(runId: string) { this.runs.find((run) => run.id === runId)!.status = 'completed'; }
@@ -17,8 +19,12 @@ class MemoryRepository implements CatalogImportRepository {
     this.products.set(product.canonicalKey, saved);
     return {id: saved.id, created: !existing};
   }
+  async upsertProducts(products: ImportProduct[]) {
+    this.productBulkCalls += 1;
+    return Promise.all(products.map(async (product) => ({canonicalKey: product.canonicalKey, ...await this.upsertProduct(product)})));
+  }
   async upsertOffer(offer: ImportOffer) { this.offers.set(`${offer.supplierCode}|${offer.sourceRow}`, offer); }
-  async upsertOffers(offers: ImportOffer[]) { this.bulkCalls += 1; for (const offer of offers) await this.upsertOffer(offer); }
+  async upsertOffers(offers: ImportOffer[]) { this.bulkCalls += 1; this.bulkOfferCounts.push(offers.length); for (const offer of offers) await this.upsertOffer(offer); }
   async markUnseenUnavailable(observedAt: string) {
     for (const [key, product] of this.products) if (product.lastSeenAt !== observedAt) this.products.set(key, {...product, unavailable: true});
   }
@@ -53,6 +59,7 @@ describe('runCatalogImport', () => {
     expect(repo.products).toHaveLength(1);
     expect(repo.offers).toHaveLength(2);
     expect(repo.bulkCalls).toBe(4);
+    expect(repo.productBulkCalls).toBe(2);
     expect(repo.lowestCost('tom ford|oud wood|edp|50')).toBe(14_760);
   });
 
@@ -70,6 +77,22 @@ describe('runCatalogImport', () => {
     expect(summary).toMatchObject({productsCreated: 0, matched: 0, review: 1, rejected: 1});
     expect(repo.products).toHaveLength(0);
     expect(repo.offers).toHaveLength(2);
+  });
+
+  it('deduplicates identical supplier rows and keeps the lowest cost', async () => {
+    const repo = new MemoryRepository();
+    const summary = await runCatalogImport({
+      client: client({A: [
+        {name: 'Tom Ford Oud Wood edp 50ml', priceUsd: 200},
+        {name: 'Tom Ford Oud Wood edp 50ml', priceUsd: 180},
+      ]}),
+      repo,
+      observedAt: '2026-07-21T10:00:00.000Z',
+    });
+
+    expect(summary).toMatchObject({sourceRows: 2, matched: 2, productsCreated: 1});
+    expect(repo.bulkOfferCounts).toEqual([1]);
+    expect([...repo.offers.values()][0].sourcePriceUsd).toBe(180);
   });
 
   it('marks products missing from the next successful snapshot unavailable', async () => {

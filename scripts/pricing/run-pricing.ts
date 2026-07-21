@@ -22,7 +22,9 @@ export interface StoredPricingDecision {
 export interface PricingRepository {
   listProductsForPricing(): Promise<PricingProduct[]>;
   saveDecision(decision: StoredPricingDecision): Promise<void>;
+  saveDecisions?(decisions: StoredPricingDecision[]): Promise<void>;
   updateAutomaticPrice(productId: string, priceRub: number | null, status: 'published' | 'request'): Promise<void>;
+  updateAutomaticPrices?(updates: Array<{productId: string; priceRub: number | null; status: 'published' | 'request'}>): Promise<void>;
 }
 
 export interface PricingRunSummary {
@@ -38,11 +40,13 @@ export async function runDailyPricing(
 ): Promise<PricingRunSummary> {
   const summary: PricingRunSummary = {processed: 0, published: 0, request: 0, manualPreserved: 0};
   const products = await repo.listProductsForPricing();
+  const decisions: StoredPricingDecision[] = [];
+  const updates: Array<{productId: string; priceRub: number | null; status: 'published' | 'request'}> = [];
 
   for (const product of products) {
     const decision = calculateRetailPrice({costRub: product.costRub, competitorPrices: product.competitorPrices});
     const flagged = decision.priceRub === null;
-    await repo.saveDecision({
+    decisions.push({
       productId: product.id,
       costRub: product.costRub,
       lowestCompetitorRub: decision.lowestCompetitorRub,
@@ -61,8 +65,16 @@ export async function runDailyPricing(
     }
 
     const status = decision.priceRub === null ? 'request' : 'published';
-    await repo.updateAutomaticPrice(product.id, decision.priceRub, status);
+    updates.push({productId: product.id, priceRub: decision.priceRub, status});
     summary[status] += 1;
+  }
+
+  if (repo.saveDecisions) await repo.saveDecisions(decisions);
+  else for (const decision of decisions) await repo.saveDecision(decision);
+
+  if (updates.length) {
+    if (repo.updateAutomaticPrices) await repo.updateAutomaticPrices(updates);
+    else for (const update of updates) await repo.updateAutomaticPrice(update.productId, update.priceRub, update.status);
   }
 
   return summary;

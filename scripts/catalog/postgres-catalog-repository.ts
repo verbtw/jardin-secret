@@ -65,6 +65,48 @@ export class PostgresCatalogRepository implements CatalogImportRepository {
     return saved;
   }
 
+  async upsertProducts(products: ImportProduct[]) {
+    const savedProducts: Array<{canonicalKey: string; id: string; created: boolean}> = [];
+    const columns = [
+      'canonical_key', 'slug', 'brand', 'name', 'flanker', 'concentration',
+      'volume_ml', 'availability', 'last_seen_at',
+    ] as const;
+    for (let start = 0; start < products.length; start += 500) {
+      const values = products.slice(start, start + 500).map((product) => ({
+        canonical_key: product.canonicalKey,
+        slug: product.slug,
+        brand: product.brand,
+        name: product.name,
+        flanker: product.flanker,
+        concentration: product.concentration,
+        volume_ml: product.volumeMl,
+        availability: 'review',
+        last_seen_at: product.lastSeenAt,
+      }));
+      const rows = await this.sql<{id: string; canonical_key: string; created: boolean}[]>`
+        insert into public.products ${this.sql(values, ...columns)}
+        on conflict (canonical_key) do update set
+          brand = excluded.brand,
+          name = excluded.name,
+          flanker = excluded.flanker,
+          concentration = excluded.concentration,
+          volume_ml = excluded.volume_ml,
+          last_seen_at = excluded.last_seen_at,
+          availability = case
+            when public.products.availability = 'out_of_stock' then 'review'
+            else public.products.availability
+          end
+        returning id::text, canonical_key, (xmax = 0) as created
+      `;
+      savedProducts.push(...rows.map((row) => ({
+        canonicalKey: row.canonical_key,
+        id: row.id,
+        created: row.created,
+      })));
+    }
+    return savedProducts;
+  }
+
   async upsertOffer(offer: ImportOffer) {
     await this.sql`
       insert into private.supplier_offers (

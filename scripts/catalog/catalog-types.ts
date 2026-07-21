@@ -10,7 +10,7 @@ export interface ParsedFragrance {
   volumeMl: number;
 }
 
-export type ReviewReason = 'tester' | 'set' | 'sample' | 'refill' | 'missing_volume' | 'missing_concentration' | 'unknown_brand';
+export type ReviewReason = 'tester' | 'set' | 'sample' | 'refill' | 'missing_volume' | 'missing_concentration' | 'missing_name' | 'unknown_brand';
 
 export interface ReviewRow {
   kind: 'review';

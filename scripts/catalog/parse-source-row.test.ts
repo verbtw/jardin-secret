@@ -60,4 +60,8 @@ describe('parseSourceRow', () => {
   it('reviews rows whose brand cannot be identified safely', () => {
     expect(parseSourceRow('Unknown House Velvet Night edp 50ml')).toMatchObject({kind: 'review', reason: 'unknown_brand'});
   });
+
+  it('reviews rows that contain no fragrance name after metadata is removed', () => {
+    expect(parseSourceRow('agent provocateur w edp 200ml')).toMatchObject({kind: 'review', reason: 'missing_name'});
+  });
 });

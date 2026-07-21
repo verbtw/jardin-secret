@@ -1,0 +1,35 @@
+name: Daily catalog sync
+
+on:
+  schedule:
+    - cron: '20 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-catalog-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Import supplier catalog
+        run: npm run import:catalog
+        env:
+          EPARFUME_EMAIL: ${{ secrets.EPARFUME_EMAIL }}
+          EPARFUME_PASSWORD: ${{ secrets.EPARFUME_PASSWORD }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      - name: Recalculate prices
+        run: npm run price:catalog
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}

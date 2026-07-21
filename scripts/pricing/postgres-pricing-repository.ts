@@ -58,6 +58,44 @@ export class PostgresPricingRepository implements PricingRepository {
     `;
   }
 
+  async saveDecisions(decisions: StoredPricingDecision[]) {
+    for (let start = 0; start < decisions.length; start += 1000) {
+      const values = decisions.slice(start, start + 1000).map((decision) => ({
+        product_id: decision.productId,
+        cost_rub: decision.costRub,
+        lowest_competitor_rub: decision.lowestCompetitorRub,
+        calculated_price_rub: decision.calculatedPriceRub,
+        profit_rub: decision.profitRub,
+        rule: decision.rule,
+        inputs: {calculatedAt: decision.calculatedAt},
+        flagged: decision.flagged,
+        flag_reason: decision.flagReason,
+        created_at: decision.calculatedAt,
+      }));
+      await this.sql`
+        insert into private.pricing_decisions (
+          product_id, cost_rub, lowest_competitor_rub, calculated_price_rub,
+          profit_rub, rule, inputs, flagged, flag_reason, created_at
+        )
+        select
+          product_id, cost_rub, lowest_competitor_rub, calculated_price_rub,
+          profit_rub, rule, inputs, flagged, flag_reason, created_at
+        from jsonb_to_recordset(${this.sql.json(values)}::jsonb) as x(
+          product_id uuid,
+          cost_rub integer,
+          lowest_competitor_rub integer,
+          calculated_price_rub integer,
+          profit_rub integer,
+          rule text,
+          inputs jsonb,
+          flagged boolean,
+          flag_reason text,
+          created_at timestamptz
+        )
+      `;
+    }
+  }
+
   async updateAutomaticPrice(productId: string, priceRub: number | null, status: 'published' | 'request') {
     await this.sql`
       update public.products set
@@ -66,6 +104,29 @@ export class PostgresPricingRepository implements PricingRepository {
         price_updated_at = now()
       where id = ${productId} and price_mode = 'auto'
     `;
+  }
+
+  async updateAutomaticPrices(updates: Array<{productId: string; priceRub: number | null; status: 'published' | 'request'}>) {
+    for (let start = 0; start < updates.length; start += 1000) {
+      const values = updates.slice(start, start + 1000).map((update) => ({
+        product_id: update.productId,
+        price_rub: update.priceRub,
+        status: update.status,
+      }));
+      await this.sql`
+        update public.products as product set
+          auto_price_rub = update_values.price_rub,
+          price_status = update_values.status,
+          price_updated_at = now()
+        from jsonb_to_recordset(${this.sql.json(values)}::jsonb) as update_values(
+          product_id uuid,
+          price_rub integer,
+          status text
+        )
+        where product.id = update_values.product_id
+          and product.price_mode = 'auto'
+      `;
+    }
   }
 
   async close() {

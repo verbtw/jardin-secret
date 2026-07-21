@@ -67,6 +67,8 @@ export function parseSourceRow(sourceRow: string): ParseResult {
     .replace(/\s+/g, ' ')
     .trim();
 
+  if (!name) return {kind: 'review', sourceRow, reason: 'missing_name'};
+
   return {
     kind: 'fragrance',
     sourceRow,

@@ -37,6 +37,7 @@ export interface CatalogImportRepository {
   completeRun(runId: string, summary: ImportSummary & {exchangeRate: number; supplierCount: number}): Promise<void>;
   failRun(runId: string, errorMessage: string): Promise<void>;
   upsertProduct(product: ImportProduct): Promise<{id: string; created: boolean}>;
+  upsertProducts?(products: ImportProduct[]): Promise<Array<{canonicalKey: string; id: string; created: boolean}>>;
   upsertOffer(offer: ImportOffer): Promise<void>;
   upsertOffers?(offers: ImportOffer[]): Promise<void>;
   markUnseenUnavailable(observedAt: string): Promise<void>;
@@ -88,11 +89,12 @@ export async function runCatalogImport({client, repo, observedAt = new Date().to
 
     for (const supplier of suppliers) {
       const rows = await client.readSupplierRows(supplier.priceId);
-      const supplierOffers: ImportOffer[] = [];
-      for (const row of rows) {
+      const productsToUpsert = new Map<string, ImportProduct>();
+      const preparedRows = rows.map((row) => {
         summary.sourceRows += 1;
         const parsed = parseSourceRow(row.name);
         const costRub = Math.round(row.priceUsd * exchangeRate);
+        let canonicalKey: string | null = null;
 
         if (parsed.kind === 'fragrance') {
           const base = {
@@ -102,20 +104,45 @@ export async function runCatalogImport({client, repo, observedAt = new Date().to
             concentration: parsed.concentration,
             volumeMl: parsed.volumeMl,
           };
-          const canonicalKey = productCanonicalKey(base);
-          const cachedId = productCache.get(canonicalKey);
-          const product = cachedId ? {id: cachedId, created: false} : await repo.upsertProduct({
+          canonicalKey = productCanonicalKey(base);
+          if (!productCache.has(canonicalKey) && !productsToUpsert.has(canonicalKey)) {
+            productsToUpsert.set(canonicalKey, {
               ...base,
               canonicalKey,
               slug: productSlug(base),
               lastSeenAt: observedAt,
             });
-          if (!cachedId) productCache.set(canonicalKey, product.id);
-          if (product.created) summary.productsCreated += 1;
+          }
           summary.matched += 1;
+        } else {
+          summary[parsed.kind] += 1;
+        }
+
+        return {row, parsed, costRub, canonicalKey};
+      });
+
+      if (repo.upsertProducts && productsToUpsert.size) {
+        const savedProducts = await repo.upsertProducts([...productsToUpsert.values()]);
+        for (const product of savedProducts) {
+          productCache.set(product.canonicalKey, product.id);
+          if (product.created) summary.productsCreated += 1;
+        }
+      } else {
+        for (const productInput of productsToUpsert.values()) {
+          const product = await repo.upsertProduct(productInput);
+          productCache.set(productInput.canonicalKey, product.id);
+          if (product.created) summary.productsCreated += 1;
+        }
+      }
+
+      const supplierOffers: ImportOffer[] = [];
+      for (const {row, parsed, costRub, canonicalKey} of preparedRows) {
+        if (parsed.kind === 'fragrance') {
+          const productId = productCache.get(canonicalKey!);
+          if (!productId) throw new Error(`Imported product was not persisted: ${canonicalKey}`);
           supplierOffers.push({
             runId,
-            productId: product.id,
+            productId,
             canonicalKey,
             supplierCode: supplier.code,
             sourceRow: row.name,
@@ -126,7 +153,6 @@ export async function runCatalogImport({client, repo, observedAt = new Date().to
             observedAt,
           });
         } else {
-          summary[parsed.kind] += 1;
           supplierOffers.push({
             runId,
             productId: null,
@@ -141,8 +167,14 @@ export async function runCatalogImport({client, repo, observedAt = new Date().to
           });
         }
       }
-      if (repo.upsertOffers) await repo.upsertOffers(supplierOffers);
-      else for (const offer of supplierOffers) await repo.upsertOffer(offer);
+      const deduplicatedOffers = new Map<string, ImportOffer>();
+      for (const offer of supplierOffers) {
+        const existing = deduplicatedOffers.get(offer.sourceRow);
+        if (!existing || offer.costRub < existing.costRub) deduplicatedOffers.set(offer.sourceRow, offer);
+      }
+      const offersToSave = [...deduplicatedOffers.values()];
+      if (repo.upsertOffers) await repo.upsertOffers(offersToSave);
+      else for (const offer of offersToSave) await repo.upsertOffer(offer);
     }
 
     await repo.markUnseenUnavailable(observedAt);

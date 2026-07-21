@@ -10,7 +10,8 @@
     "test:e2e": "playwright test",
     "import:telegram": "tsx scripts/import-telegram.ts",
     "import:reviews": "tsx scripts/import-telegram-reviews.ts",
-    "import:catalog": "tsx scripts/catalog/run-import.ts"
+    "import:catalog": "tsx scripts/catalog/run-import.ts",
+    "price:catalog": "tsx scripts/pricing/run-postgres-pricing.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.110.7",
