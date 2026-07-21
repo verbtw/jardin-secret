@@ -15,10 +15,12 @@
     "@supabase/supabase-js": "2.110.7",
     "@vitejs/plugin-react": "latest",
     "cheerio": "latest",
+    "fetch-cookie": "3.2.0",
     "lucide-react": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "react-router-dom": "latest"
+    "react-router-dom": "latest",
+    "tough-cookie": "6.0.2"
   },
   "devDependencies": {
     "@playwright/test": "latest",
