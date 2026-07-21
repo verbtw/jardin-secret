@@ -41,10 +41,7 @@ export class PostgresCatalogRepository implements CatalogImportRepository {
   }
 
   async upsertProduct(product: ImportProduct) {
-    const existing = await this.sql<{id: string}[]>`
-      select id::text from public.products where canonical_key = ${product.canonicalKey}
-    `;
-    const [saved] = await this.sql<{id: string}[]>`
+    const [saved] = await this.sql<{id: string; created: boolean}[]>`
       insert into public.products (
         canonical_key, slug, brand, name, flanker, concentration,
         volume_ml, availability, last_seen_at
@@ -63,9 +60,9 @@ export class PostgresCatalogRepository implements CatalogImportRepository {
           when public.products.availability = 'out_of_stock' then 'review'
           else public.products.availability
         end
-      returning id::text
+      returning id::text, (xmax = 0) as created
     `;
-    return {id: saved.id, created: existing.length === 0};
+    return saved;
   }
 
   async upsertOffer(offer: ImportOffer) {
@@ -90,6 +87,39 @@ export class PostgresCatalogRepository implements CatalogImportRepository {
     `;
   }
 
+  async upsertOffers(offers: ImportOffer[]) {
+    const columns = [
+      'product_id', 'import_run_id', 'supplier_code', 'source_row', 'source_price_usd',
+      'cost_rub', 'parse_status', 'parse_reason', 'in_stock', 'observed_at',
+    ] as const;
+    for (let start = 0; start < offers.length; start += 500) {
+      const values = offers.slice(start, start + 500).map((offer) => ({
+        product_id: offer.productId,
+        import_run_id: offer.runId,
+        supplier_code: offer.supplierCode,
+        source_row: offer.sourceRow,
+        source_price_usd: offer.sourcePriceUsd,
+        cost_rub: offer.costRub,
+        parse_status: offer.parseStatus,
+        parse_reason: offer.parseReason,
+        in_stock: true,
+        observed_at: offer.observedAt,
+      }));
+      await this.sql`
+        insert into private.supplier_offers ${this.sql(values, ...columns)}
+        on conflict (supplier_code, source_row) do update set
+          product_id = excluded.product_id,
+          import_run_id = excluded.import_run_id,
+          source_price_usd = excluded.source_price_usd,
+          cost_rub = excluded.cost_rub,
+          parse_status = excluded.parse_status,
+          parse_reason = excluded.parse_reason,
+          in_stock = true,
+          observed_at = excluded.observed_at
+      `;
+    }
+  }
+
   async markUnseenUnavailable(observedAt: string) {
     await this.sql.begin(async (transaction) => {
       await transaction`
@@ -108,4 +138,3 @@ export class PostgresCatalogRepository implements CatalogImportRepository {
     await this.sql.end({timeout: 5});
   }
 }
-

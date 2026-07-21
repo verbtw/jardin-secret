@@ -6,6 +6,7 @@ class MemoryRepository implements CatalogImportRepository {
   products = new Map<string, ImportProduct & {id: string; unavailable?: boolean}>();
   offers = new Map<string, ImportOffer>();
   runs: Array<{id: string; status: string}> = [];
+  bulkCalls = 0;
 
   async startRun() { const run = {id: `run-${this.runs.length + 1}`, status: 'running'}; this.runs.push(run); return run.id; }
   async completeRun(runId: string) { this.runs.find((run) => run.id === runId)!.status = 'completed'; }
@@ -17,6 +18,7 @@ class MemoryRepository implements CatalogImportRepository {
     return {id: saved.id, created: !existing};
   }
   async upsertOffer(offer: ImportOffer) { this.offers.set(`${offer.supplierCode}|${offer.sourceRow}`, offer); }
+  async upsertOffers(offers: ImportOffer[]) { this.bulkCalls += 1; for (const offer of offers) await this.upsertOffer(offer); }
   async markUnseenUnavailable(observedAt: string) {
     for (const [key, product] of this.products) if (product.lastSeenAt !== observedAt) this.products.set(key, {...product, unavailable: true});
   }
@@ -50,6 +52,7 @@ describe('runCatalogImport', () => {
     expect(second).toMatchObject({productsCreated: 0, matched: 2});
     expect(repo.products).toHaveLength(1);
     expect(repo.offers).toHaveLength(2);
+    expect(repo.bulkCalls).toBe(4);
     expect(repo.lowestCost('tom ford|oud wood|edp|50')).toBe(14_760);
   });
 

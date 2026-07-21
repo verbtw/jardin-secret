@@ -38,6 +38,7 @@ export interface CatalogImportRepository {
   failRun(runId: string, errorMessage: string): Promise<void>;
   upsertProduct(product: ImportProduct): Promise<{id: string; created: boolean}>;
   upsertOffer(offer: ImportOffer): Promise<void>;
+  upsertOffers?(offers: ImportOffer[]): Promise<void>;
   markUnseenUnavailable(observedAt: string): Promise<void>;
 }
 
@@ -78,6 +79,7 @@ export function productSlug(product: Pick<ImportProduct, 'brand' | 'name' | 'fla
 export async function runCatalogImport({client, repo, observedAt = new Date().toISOString()}: CatalogImportDependencies): Promise<ImportSummary> {
   const summary: ImportSummary = {productsCreated: 0, matched: 0, review: 0, rejected: 0, sourceRows: 0};
   const runId = await repo.startRun(observedAt);
+  const productCache = new Map<string, string>();
 
   try {
     await client.login();
@@ -86,6 +88,7 @@ export async function runCatalogImport({client, repo, observedAt = new Date().to
 
     for (const supplier of suppliers) {
       const rows = await client.readSupplierRows(supplier.priceId);
+      const supplierOffers: ImportOffer[] = [];
       for (const row of rows) {
         summary.sourceRows += 1;
         const parsed = parseSourceRow(row.name);
@@ -100,15 +103,17 @@ export async function runCatalogImport({client, repo, observedAt = new Date().to
             volumeMl: parsed.volumeMl,
           };
           const canonicalKey = productCanonicalKey(base);
-          const product = await repo.upsertProduct({
-            ...base,
-            canonicalKey,
-            slug: productSlug(base),
-            lastSeenAt: observedAt,
-          });
+          const cachedId = productCache.get(canonicalKey);
+          const product = cachedId ? {id: cachedId, created: false} : await repo.upsertProduct({
+              ...base,
+              canonicalKey,
+              slug: productSlug(base),
+              lastSeenAt: observedAt,
+            });
+          if (!cachedId) productCache.set(canonicalKey, product.id);
           if (product.created) summary.productsCreated += 1;
           summary.matched += 1;
-          await repo.upsertOffer({
+          supplierOffers.push({
             runId,
             productId: product.id,
             canonicalKey,
@@ -122,7 +127,7 @@ export async function runCatalogImport({client, repo, observedAt = new Date().to
           });
         } else {
           summary[parsed.kind] += 1;
-          await repo.upsertOffer({
+          supplierOffers.push({
             runId,
             productId: null,
             canonicalKey: null,
@@ -136,6 +141,8 @@ export async function runCatalogImport({client, repo, observedAt = new Date().to
           });
         }
       }
+      if (repo.upsertOffers) await repo.upsertOffers(supplierOffers);
+      else for (const offer of supplierOffers) await repo.upsertOffer(offer);
     }
 
     await repo.markUnseenUnavailable(observedAt);
@@ -146,4 +153,3 @@ export async function runCatalogImport({client, repo, observedAt = new Date().to
     throw error;
   }
 }
-
