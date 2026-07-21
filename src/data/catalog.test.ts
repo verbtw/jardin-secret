@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getProducts } from './catalog';
 
 describe('getProducts', () => {
-  it('returns products with stable source links', () => {
+  it('returns products without legacy Telegram editorial copy', () => {
     const products = getProducts();
     expect(products.length).toBeGreaterThan(0);
     expect(products[0]).toMatchObject({
@@ -11,6 +11,7 @@ describe('getProducts', () => {
       brand: expect.any(String),
       name: expect.any(String),
     });
-    expect(products[0].sourceUrl).toMatch(/^https:\/\/t\.me\/jardinnsecret\/\d+$/);
+    expect(products[0].sourceUrl).toBe('');
+    expect(products[0].description).toBe('');
   });
 });

@@ -1,0 +1,31 @@
+.fragrance-profile {
+  display: grid;
+  gap: .45rem;
+  margin: 1.25rem 0;
+  color: #617269;
+}
+
+.fragrance-profile p { margin: 0; }
+
+.note-pyramid {
+  display: grid;
+  gap: .75rem;
+  margin: 1.5rem 0;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, .46);
+}
+
+.note-pyramid p {
+  display: grid;
+  gap: .2rem;
+  margin: 0;
+}
+
+.note-pyramid strong {
+  font-size: .72rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.note-pyramid span { color: #617269; }

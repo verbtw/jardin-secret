@@ -1,6 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
+  "functions": {
+    "api/daily-sync.ts": {
+      "maxDuration": 300
+    }
+  },
   "routes": [
     {
       "handle": "filesystem"

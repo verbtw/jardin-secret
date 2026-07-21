@@ -6,6 +6,7 @@ export interface AuthState {
   user: User | null;
   loading: boolean;
   configured: boolean;
+  isAdmin?: boolean;
   signUp(email: string, password: string): Promise<void>;
   signIn(email: string, password: string): Promise<void>;
   signOut(): Promise<void>;
@@ -27,6 +28,7 @@ function throwIfError(error: Error | null) {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(isAuthConfigured);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
@@ -40,10 +42,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => { active = false; subscription.unsubscribe(); };
   }, []);
 
+  useEffect(() => {
+    if (!supabase || !user) { setIsAdmin(false); return; }
+    let active = true;
+    supabase.rpc('current_user_is_admin').then(({data, error}) => {
+      if (active) setIsAdmin(!error && data === true);
+    });
+    return () => { active = false; };
+  }, [user]);
+
   const value = useMemo<AuthState>(() => ({
     user,
     loading,
     configured: isAuthConfigured,
+    isAdmin,
     async signUp(email, password) {
       const { error } = await client().auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/account` } });
       throwIfError(error);
@@ -58,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throwIfError(error);
     },
     async updatePassword(password) { const { error } = await client().auth.updateUser({ password }); throwIfError(error); },
-  }), [loading, user]);
+  }), [isAdmin, loading, user]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

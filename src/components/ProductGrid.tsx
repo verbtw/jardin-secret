@@ -1,7 +1,7 @@
 import type { Product } from '../types/product';
 import { ProductCard } from './ProductCard';
 
-export function ProductGrid({ products, onReset, onAdd }: { products: Product[]; onReset: () => void; onAdd?: (id: string) => void }) {
+export function ProductGrid({ products, onReset }: { products: Product[]; onReset: () => void }) {
   if (!products.length) {
     return (
       <div className="empty-state">
@@ -12,5 +12,5 @@ export function ProductGrid({ products, onReset, onAdd }: { products: Product[];
       </div>
     );
   }
-  return <div className="product-grid">{products.map((product) => <ProductCard key={product.id} product={product} onAdd={onAdd} />)}</div>;
+  return <div className="product-grid">{products.map((product) => <ProductCard key={product.id} product={product} />)}</div>;
 }

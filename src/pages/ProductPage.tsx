@@ -1,18 +1,15 @@
-import { ArrowLeft, ExternalLink, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Send } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { getProducts } from '../data/catalog';
-import { getOrderReadiness } from '../domain/catalog';
-import { useCart } from '../hooks/useCart';
+import { buildManagerUrl } from '../domain/telegram-order';
+import { useCatalogProducts } from '../hooks/useCatalogProducts';
 
-const products = getProducts();
 const rubles = new Intl.NumberFormat('ru-RU');
 
 export function ProductPage() {
+  const products = useCatalogProducts();
   const { slug } = useParams();
   const product = products.find((item) => item.slug === slug);
-  const { add } = useCart();
   if (!product) return <main className="empty-page"><p className="eyebrow">404</p><h1>Аромат не найден</h1><Link className="button" to="/catalog">Вернуться в каталог</Link></main>;
-  const orderReadiness = getOrderReadiness(product);
   return (
     <main className="product-page">
       <Link className="back-link" to="/catalog"><ArrowLeft size={16} />Назад в каталог</Link>
@@ -23,9 +20,22 @@ export function ProductPage() {
           <p className="product-detail__price">{product.priceRub ? `${rubles.format(product.priceRub)} ₽` : 'Цену уточнит менеджер'}</p>
           <div className="detail-facts"><span><small>Объём</small>{product.volumeMl ? `${product.volumeMl} мл` : 'Уточнить'}</span><span><small>Наличие</small>{product.availability === 'in-stock' ? 'В наличии' : 'Уточнить'}</span><span><small>Оригинальность</small>100% оригинал</span></div>
           {product.description && <p className="product-description">{product.description}</p>}
-          <p className="price-note">Цена и наличие указаны по публикации канала и подтверждаются менеджером перед заказом.</p>
-          <div className="detail-actions">{orderReadiness.ready ? <button className="button" type="button" onClick={() => add(product.id)}><ShoppingBag size={17} />Добавить в корзину</button> : <a className="button" href="https://t.me/jardinmanager" target="_blank" rel="noreferrer">Уточнить у менеджера</a>}<a className="button button--outline" href="https://t.me/jardinmanager" target="_blank" rel="noreferrer">Заказать в Telegram</a></div>
-          <a className="source-link" href={product.sourceUrl} target="_blank" rel="noreferrer"><ExternalLink size={15} />Открыть исходную публикацию</a>
+          {(product.fragranceFamily || product.launchYear || product.perfumers?.length) && (
+            <div className="fragrance-profile">
+              {product.fragranceFamily && <p><strong>Семейство:</strong> {product.fragranceFamily}</p>}
+              {product.launchYear && <p><strong>Год выпуска:</strong> {product.launchYear}</p>}
+              {product.perfumers?.length ? <p><strong>Парфюмер:</strong> {product.perfumers.join(', ')}</p> : null}
+            </div>
+          )}
+          {(product.topNotes?.length || product.heartNotes?.length || product.baseNotes?.length) && (
+            <div className="note-pyramid" aria-label="Пирамида аромата">
+              {product.topNotes?.length ? <p><strong>Верхние ноты</strong><span>{product.topNotes.join(', ')}</span></p> : null}
+              {product.heartNotes?.length ? <p><strong>Ноты сердца</strong><span>{product.heartNotes.join(', ')}</span></p> : null}
+              {product.baseNotes?.length ? <p><strong>Базовые ноты</strong><span>{product.baseNotes.join(', ')}</span></p> : null}
+            </div>
+          )}
+          <p className="price-note">Актуальную цену, наличие и срок доставки менеджер подтвердит перед заказом.</p>
+          <div className="detail-actions"><a className="button" href={buildManagerUrl(product, window.location.origin)} target="_blank" rel="noreferrer"><Send size={17} />Написать менеджеру</a></div>
         </div>
       </div>
     </main>
