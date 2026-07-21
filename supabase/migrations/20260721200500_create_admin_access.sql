@@ -51,6 +51,10 @@ grant select (
   price_status, price_updated_at, created_at, last_seen_at
 ) on public.products to authenticated;
 
+grant select (
+  auto_price_rub, manual_price_rub, price_mode, price_status
+) on public.products to anon;
+
 grant update (
   brand, name, flanker, concentration, volume_ml, availability,
   description, fragrance_family, top_notes, heart_notes, base_notes,
