@@ -5,6 +5,7 @@ import type {EnrichmentProfile, EnrichmentRepository} from './run-enrichment.js'
 interface ProfileRow {
   brand: string;
   name: string;
+  flanker: string | null;
   concentration: string | null;
 }
 
@@ -17,14 +18,14 @@ export class PostgresEnrichmentRepository implements EnrichmentRepository {
 
   async listMissingProfiles(limit: number): Promise<EnrichmentProfile[]> {
     const rows = await this.sql<ProfileRow[]>`
-      select distinct on (lower(brand), lower(name), coalesce(lower(concentration), ''))
-        brand, name, concentration
+      select distinct on (lower(brand), lower(name), coalesce(lower(flanker), ''), coalesce(lower(concentration), ''))
+        brand, name, flanker, concentration
       from public.products
       where details_status in ('missing', 'partial')
-      order by lower(brand), lower(name), coalesce(lower(concentration), ''), created_at
+      order by lower(brand), lower(name), coalesce(lower(flanker), ''), coalesce(lower(concentration), ''), created_at
       limit ${limit}
     `;
-    return rows.map((row) => ({brand: row.brand, name: row.name, concentration: row.concentration}));
+    return rows.map((row) => ({brand: row.brand, name: row.name, flanker: row.flanker, concentration: row.concentration}));
   }
 
   async saveVerifiedProfile(profile: EnrichmentProfile, details: FragranceDetails) {
@@ -41,9 +42,15 @@ export class PostgresEnrichmentRepository implements EnrichmentRepository {
           launch_year = ${details.launchYear},
           image_url = ${details.imageUrl},
           details_source_url = ${details.sourceUrl},
-          details_status = 'verified'
+          details_status = 'verified',
+          availability = case when exists (
+            select 1 from private.supplier_offers offer
+            where offer.product_id = public.products.id and offer.in_stock
+          ) then 'in_stock' else availability end,
+          published = true
         where lower(brand) = lower(${profile.brand})
           and lower(name) = lower(${profile.name})
+          and coalesce(lower(flanker), '') = coalesce(lower(${profile.flanker ?? null}), '')
           and coalesce(lower(concentration), '') = coalesce(lower(${profile.concentration}), '')
           and details_status <> 'verified'
         returning id::text
@@ -77,6 +84,7 @@ export class PostgresEnrichmentRepository implements EnrichmentRepository {
       update public.products set details_status = 'review'
       where lower(brand) = lower(${profile.brand})
         and lower(name) = lower(${profile.name})
+        and coalesce(lower(flanker), '') = coalesce(lower(${profile.flanker ?? null}), '')
         and coalesce(lower(concentration), '') = coalesce(lower(${profile.concentration}), '')
         and details_status in ('missing', 'partial')
     `;

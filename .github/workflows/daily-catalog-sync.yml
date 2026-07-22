@@ -32,11 +32,10 @@ jobs:
           EPARFUME_PASSWORD: ${{ secrets.EPARFUME_PASSWORD }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
       - name: Enrich fragrance profiles
-        if: ${{ env.FRAGELLA_API_KEY != '' }}
         run: npm run enrich:catalog
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          ENRICHMENT_BATCH_SIZE: ${{ vars.ENRICHMENT_BATCH_SIZE || '20' }}
+          ENRICHMENT_BATCH_SIZE: ${{ vars.ENRICHMENT_BATCH_SIZE || '30000' }}
       - name: Recalculate prices
         run: npm run price:catalog
         env:

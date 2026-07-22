@@ -48,6 +48,14 @@ describe('buildRussianDescription', () => {
       'Tom Ford Oud Wood — древесный аромат. В композиции раскрываются палисандр и уд, а завершение формируют сандал и амбра.',
     );
   });
+
+  it('keeps a structured single-note description publishable', () => {
+    const description = buildRussianDescription({
+      ...oudWood, Brand: 'A', Name: 'B', Notes: undefined, 'General Notes': ['Iris'],
+    });
+    expect(description.length).toBeGreaterThanOrEqual(60);
+    expect(description).toContain('ирис');
+  });
 });
 
 it('reads the remaining provider quota', async () => {

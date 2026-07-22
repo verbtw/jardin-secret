@@ -17,7 +17,7 @@ export interface EnrichmentRepository {
 }
 
 export interface EnrichmentProvider {
-  search(query: string): Promise<FragellaFragrance[]>;
+  search(query: string, profile?: EnrichmentProfile): Promise<FragellaFragrance[]>;
   remainingRequests?(): Promise<number>;
 }
 
@@ -48,7 +48,7 @@ export function mapFragellaDetails(fragrance: FragellaFragrance): FragranceDetai
     perfumers: [],
     launchYear: parseYear(fragrance.Year),
     imageUrl,
-    sourceUrl: `https://app.fragella.com/fragrance/${encodeURIComponent(fragrance._id)}`,
+    sourceUrl: fragrance['Source URL'] ?? `https://app.fragella.com/fragrance/${encodeURIComponent(fragrance._id)}`,
     sourceType: 'major_catalog',
   };
 }
@@ -61,7 +61,8 @@ export async function runProductEnrichment({repo, provider, limit}: EnrichmentDe
   const profiles = await repo.listMissingProfiles(capacity);
   for (const profile of profiles) {
     summary.requested += 1;
-    const candidates = await provider.search(`${profile.brand} ${profile.name}`);
+    const fullName = [profile.name, profile.flanker].filter(Boolean).join(' ');
+    const candidates = await provider.search(`${profile.brand} ${fullName}`, profile);
     const matched = selectFragellaMatch(profile, candidates);
     const details = matched ? mapFragellaDetails(matched) : null;
     if (!details || !validateDetails(details).valid) {
