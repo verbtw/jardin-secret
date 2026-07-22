@@ -11,6 +11,7 @@
     "import:telegram": "tsx scripts/import-telegram.ts",
     "import:reviews": "tsx scripts/import-telegram-reviews.ts",
     "import:catalog": "tsx scripts/catalog/run-import.ts",
+    "enrich:catalog": "tsx scripts/catalog/run-postgres-enrichment.ts",
     "price:catalog": "tsx scripts/pricing/run-postgres-pricing.ts"
   },
   "dependencies": {

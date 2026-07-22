@@ -67,6 +67,7 @@ export function mapCatalogRow(row: PublicCatalogRow): Product {
     topNotes: row.top_notes,
     heartNotes: row.heart_notes,
     baseNotes: row.base_notes,
+    keyNotes: row.key_notes,
     accords: row.key_accords,
     perfumers: row.perfumers,
     launchYear: row.launch_year,

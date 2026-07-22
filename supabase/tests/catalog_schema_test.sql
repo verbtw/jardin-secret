@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(12);
+select plan(13);
 
 select has_table('public', 'products', 'public products table exists');
 select has_view('public', 'public_catalog', 'restricted public catalog view exists');
@@ -25,6 +25,7 @@ select ok(has_table_privilege('anon', 'public.public_catalog', 'select'), 'anon 
 select ok(has_table_privilege('authenticated', 'public.public_catalog', 'select'), 'authenticated users can read the catalog view');
 select ok(not has_table_privilege('anon', 'public.products', 'insert'), 'anon cannot insert products');
 select ok(not has_table_privilege('authenticated', 'public.products', 'update'), 'customers cannot update products');
+select has_check('public', 'products', 'products_published_details_complete', 'published products require complete verified details');
 
 select * from finish();
 rollback;
