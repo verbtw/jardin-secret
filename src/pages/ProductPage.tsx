@@ -2,6 +2,7 @@ import { ArrowLeft, Send } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { buildManagerUrl } from '../domain/telegram-order';
 import { useCatalogProducts } from '../hooks/useCatalogProducts';
+import { FragranceNotes } from '../components/FragranceNotes';
 
 const rubles = new Intl.NumberFormat('ru-RU');
 
@@ -27,13 +28,12 @@ export function ProductPage() {
               {product.perfumers?.length ? <p><strong>Парфюмер:</strong> {product.perfumers.join(', ')}</p> : null}
             </div>
           )}
-          {(product.topNotes?.length || product.heartNotes?.length || product.baseNotes?.length) && (
-            <div className="note-pyramid" aria-label="Пирамида аромата">
-              {product.topNotes?.length ? <p><strong>Верхние ноты</strong><span>{product.topNotes.join(', ')}</span></p> : null}
-              {product.heartNotes?.length ? <p><strong>Ноты сердца</strong><span>{product.heartNotes.join(', ')}</span></p> : null}
-              {product.baseNotes?.length ? <p><strong>Базовые ноты</strong><span>{product.baseNotes.join(', ')}</span></p> : null}
-            </div>
-          )}
+          <FragranceNotes
+            top={product.topNotes ?? []}
+            heart={product.heartNotes ?? []}
+            base={product.baseNotes ?? []}
+            keyNotes={product.keyNotes ?? []}
+          />
           <p className="price-note">Актуальную цену, наличие и срок доставки менеджер подтвердит перед заказом.</p>
           <div className="detail-actions"><a className="button" href={buildManagerUrl(product, window.location.origin)} target="_blank" rel="noreferrer"><Send size={17} />Написать менеджеру</a></div>
         </div>

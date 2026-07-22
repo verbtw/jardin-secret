@@ -17,6 +17,7 @@ export interface Product {
   topNotes?: string[];
   heartNotes?: string[];
   baseNotes?: string[];
+  keyNotes?: string[];
   accords?: string[];
   perfumers?: string[];
   launchYear?: number | null;
