@@ -79,3 +79,28 @@ it('includes a flanker in matching and updates only that profile', async () => {
   expect(provider.search).toHaveBeenCalledWith('Tom Ford Oud Wood Intense', profile);
   expect(repo.saved[0].profile.flanker).toBe('Intense');
 });
+
+it('persists matches and reviews in batches when the repository supports it', async () => {
+  const profiles = [
+    {brand: 'Tom Ford', name: 'Oud Wood', concentration: 'EDP'},
+    {brand: 'Tom Ford', name: 'Lost Cherry', concentration: 'EDP'},
+  ];
+  const repo = new MemoryRepository(profiles) as MemoryRepository & Required<Pick<
+    EnrichmentRepository, 'saveVerifiedProfiles' | 'markProfilesForReview'
+  >>;
+  repo.saveVerifiedProfiles = vi.fn(async () => 3);
+  repo.markProfilesForReview = vi.fn(async () => undefined);
+  const provider = {search: vi.fn()
+    .mockResolvedValueOnce([record])
+    .mockResolvedValueOnce([])};
+
+  await expect(runProductEnrichment({repo, provider, limit: 10})).resolves.toEqual({
+    requested: 2, matched: 1, variantsVerified: 3, review: 1,
+  });
+  expect(repo.saved).toHaveLength(0);
+  expect(repo.reviewed).toHaveLength(0);
+  expect(repo.saveVerifiedProfiles).toHaveBeenCalledWith([
+    expect.objectContaining({profile: profiles[0]}),
+  ]);
+  expect(repo.markProfilesForReview).toHaveBeenCalledWith([profiles[1]]);
+});
