@@ -15,7 +15,12 @@ export interface AdminProduct {
   top_notes: string[];
   heart_notes: string[];
   base_notes: string[];
+  key_notes: string[];
+  key_accords: string[];
+  perfumers: string[];
+  launch_year: number | null;
   image_url: string | null;
+  details_source_url: string | null;
   details_status: 'missing' | 'partial' | 'verified' | 'review';
   auto_price_rub: number | null;
   manual_price_rub: number | null;
@@ -40,7 +45,12 @@ export interface AdminProductPatch {
   top_notes?: string[];
   heart_notes?: string[];
   base_notes?: string[];
+  key_notes?: string[];
+  key_accords?: string[];
+  perfumers?: string[];
+  launch_year?: number | null;
   image_url?: string | null;
+  details_source_url?: string | null;
   details_status?: AdminProduct['details_status'];
   availability?: AdminProduct['availability'];
   published?: boolean;
