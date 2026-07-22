@@ -88,6 +88,21 @@ function normalize(value: string) {
   return brandEquivalents[normalized] ?? normalized;
 }
 
+function comparableName(value: string) {
+  const tokens = normalize(value).split(' ').filter((token) => ![
+    'original', 'оригинал', 'unbox', 'unboxed',
+  ].includes(token)).map((token) => token === 'men' ? 'man' : token === 'women' ? 'woman' : token);
+  const gender = ['man', 'woman'].includes(tokens.at(-1) ?? '') ? tokens.at(-1)! : null;
+  return {full: tokens.join(' '), base: gender ? tokens.slice(0, -1).join(' ') : tokens.join(' '), gender};
+}
+
+function namesMatch(left: string, right: string) {
+  const a = comparableName(left);
+  const b = comparableName(right);
+  if (a.full === b.full) return true;
+  return Boolean(a.base && a.base === b.base && (!a.gender || !b.gender || a.gender === b.gender));
+}
+
 function normalizeConcentration(value: string | null | undefined) {
   if (!value) return null;
   return concentrationEquivalents[normalize(value)] ?? normalize(value);
@@ -95,10 +110,10 @@ function normalizeConcentration(value: string | null | undefined) {
 
 export function selectFragellaMatch(profile: FragranceProfileQuery, candidates: FragellaFragrance[]) {
   const brand = normalize(profile.brand);
-  const name = normalize([profile.name, profile.flanker].filter(Boolean).join(' '));
+  const name = [profile.name, profile.flanker].filter(Boolean).join(' ');
   const concentration = normalizeConcentration(profile.concentration);
   return candidates.find((candidate) => {
-    if (normalize(candidate.Brand) !== brand || normalize(candidate.Name) !== name) return false;
+    if (normalize(candidate.Brand) !== brand || !namesMatch(candidate.Name, name)) return false;
     const candidateConcentration = normalizeConcentration(candidate.OilType);
     return !concentration || !candidateConcentration || concentration === candidateConcentration;
   }) ?? null;

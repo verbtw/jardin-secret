@@ -9,7 +9,7 @@ const nonFragrance = [
 const reviewPackaging: ReadonlyArray<readonly [pattern: RegExp, reason: ReviewReason]> = [
   [/(?:^|\s)(?:tester|тестер)(?=$|\s|[,;+()/])/i, 'tester'],
   [/(?:^|\s)(?:набор|set|coffret|gift\s*set)(?=$|\s|[,;+()/])/i, 'set'],
-  [/(?:^|\s)(?:пробник|sample|vial|миниатюр\w*)(?=$|\s|[,;+()/])/i, 'sample'],
+  [/(?:^|\s)(?:пробник|sample|vial|миниатюр\w*|отливант|распив)(?=$|\s|[,;+()/])/i, 'sample'],
   [/(?:^|\s)(?:refill|recharge|запасн(?:ой|ый)\s+блок)(?=$|\s|[,;+()/])/i, 'refill'],
 ];
 
