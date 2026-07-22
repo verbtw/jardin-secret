@@ -13,7 +13,9 @@ export type EnrichmentProfile = FragranceProfileQuery;
 export interface EnrichmentRepository {
   listMissingProfiles(limit: number): Promise<EnrichmentProfile[]>;
   saveVerifiedProfile(profile: EnrichmentProfile, details: FragranceDetails): Promise<number>;
+  saveVerifiedProfiles?(items: Array<{profile: EnrichmentProfile; details: FragranceDetails}>): Promise<number>;
   markProfileForReview(profile: EnrichmentProfile): Promise<void>;
+  markProfilesForReview?(profiles: EnrichmentProfile[]): Promise<void>;
 }
 
 export interface EnrichmentProvider {
@@ -59,6 +61,8 @@ export async function runProductEnrichment({repo, provider, limit}: EnrichmentDe
   const capacity = Math.min(limit, Math.max(0, Math.floor(remaining)));
   if (capacity === 0) return summary;
   const profiles = await repo.listMissingProfiles(capacity);
+  const verifiedItems: Array<{profile: EnrichmentProfile; details: FragranceDetails}> = [];
+  const reviewProfiles: EnrichmentProfile[] = [];
   for (const profile of profiles) {
     summary.requested += 1;
     const fullName = [profile.name, profile.flanker].filter(Boolean).join(' ');
@@ -66,12 +70,16 @@ export async function runProductEnrichment({repo, provider, limit}: EnrichmentDe
     const matched = selectFragellaMatch(profile, candidates);
     const details = matched ? mapFragellaDetails(matched) : null;
     if (!details || !validateDetails(details).valid) {
-      await repo.markProfileForReview(profile);
+      if (repo.markProfilesForReview) reviewProfiles.push(profile);
+      else await repo.markProfileForReview(profile);
       summary.review += 1;
       continue;
     }
     summary.matched += 1;
-    summary.variantsVerified += await repo.saveVerifiedProfile(profile, details);
+    if (repo.saveVerifiedProfiles) verifiedItems.push({profile, details});
+    else summary.variantsVerified += await repo.saveVerifiedProfile(profile, details);
   }
+  if (verifiedItems.length) summary.variantsVerified += await repo.saveVerifiedProfiles!(verifiedItems);
+  if (reviewProfiles.length) await repo.markProfilesForReview!(reviewProfiles);
   return summary;
 }
