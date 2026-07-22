@@ -90,4 +90,20 @@ describe('open perfume dataset', () => {
     await expect(provider.search('Dior Sauvage', {brand: 'Dior', name: 'Sauvage'}))
       .resolves.toHaveLength(1);
   });
+
+  it('normalizes supplier gender and packaging qualifiers without matching decants', async () => {
+    const qualifiedCsv = csv.replace('Oud Wood', 'Authentic Man');
+    const provider = new OpenPerfumeDatasetProvider({
+      fetcher: vi.fn(async () => new Response(qualifiedCsv)) as unknown as typeof fetch,
+      imageBaseUrl: 'https://shop.example/api/perfume-image',
+      archiveEntries: new Map([['oud-wood.jpg', {
+        localHeaderOffset: 1, compressedSize: 2, uncompressedSize: 3, compressionMethod: 8,
+      }]]),
+    });
+
+    await expect(provider.search('', {brand: 'Tom Ford', name: 'Authentic men оригинал'}))
+      .resolves.toHaveLength(1);
+    await expect(provider.search('', {brand: 'Tom Ford', name: 'Authentic Man отливант'}))
+      .resolves.toHaveLength(0);
+  });
 });

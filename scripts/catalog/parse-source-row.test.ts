@@ -45,6 +45,8 @@ describe('parseSourceRow', () => {
     ['Tom Ford Oud Wood набор edp 50ml + 10ml', 'set'],
     ['Tom Ford Oud Wood пробник edp 2ml', 'sample'],
     ['Tom Ford Oud Wood refill edp 100ml', 'refill'],
+    ['12 Parfumeurs Français Azay le Rideau отливант parfum 10ml', 'sample'],
+    ['Tom Ford Oud Wood распив edp 10ml', 'sample'],
   ] as const)('sends unsupported packaging to review: %s', (sourceRow, reason) => {
     expect(parseSourceRow(sourceRow)).toMatchObject({kind: 'review', reason});
   });

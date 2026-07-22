@@ -49,6 +49,20 @@ function profileKey(brand: string, name: string) {
   return `${canonicalBrand(brand)}|${normalize(name)}`;
 }
 
+function comparableNames(value: string) {
+  const tokens = normalize(value).split(' ').filter((token) => ![
+    'original', 'оригинал', 'unbox', 'unboxed',
+  ].includes(token)).map((token) => token === 'men' ? 'man' : token === 'women' ? 'woman' : token);
+  const full = tokens.join(' ');
+  const withoutGender = ['man', 'woman'].includes(tokens.at(-1) ?? '')
+    ? tokens.slice(0, -1).join(' ') : full;
+  return [...new Set([full, withoutGender].filter(Boolean))];
+}
+
+function containsUnsupportedPackaging(value: string) {
+  return /(?:^|\s)(?:отливант|распив|пробник|sample|vial|tester|тестер)(?:$|\s)/i.test(` ${value} `);
+}
+
 function splitWords(value: string) {
   return value.split(/\s+/).map((word) => word.trim()).filter(Boolean);
 }
@@ -161,8 +175,10 @@ export class OpenPerfumeDatasetProvider {
       this.records = parseOpenPerfumeCsv(await response.text());
       this.recordIndex = new Map();
       for (const record of this.records) {
-        const key = profileKey(record.brand, record.name);
-        this.recordIndex.set(key, [...(this.recordIndex.get(key) ?? []), record]);
+        for (const name of comparableNames(record.name)) {
+          const key = profileKey(record.brand, name);
+          this.recordIndex.set(key, [...(this.recordIndex.get(key) ?? []), record]);
+        }
       }
     }
     this.archiveEntries ??= await loadArchiveEntries(this.fetcher);
@@ -171,10 +187,11 @@ export class OpenPerfumeDatasetProvider {
   async search(_query: string, profile?: {brand: string; name: string; flanker?: string | null}): Promise<FragellaFragrance[]> {
     await this.load();
     const desiredName = profile ? [profile.name, profile.flanker].filter(Boolean).join(' ') : '';
+    if (profile && containsUnsupportedPackaging(desiredName)) return [];
     const records = profile
-      ? this.recordIndex!.get(profileKey(profile.brand, desiredName)) ?? []
+      ? comparableNames(desiredName).flatMap((name) => this.recordIndex!.get(profileKey(profile.brand, name)) ?? [])
       : this.records!.filter((record) => normalize(`${record.brand} ${record.name}`) === normalize(_query));
-    return records
+    return [...new Set(records)]
       .map((record) => {
         const archiveName = this.archiveEntries!.has(record.imageName)
           ? record.imageName : `images/${record.imageName}`;
