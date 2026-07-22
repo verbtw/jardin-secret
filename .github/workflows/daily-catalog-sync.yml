@@ -16,6 +16,8 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      FRAGELLA_API_KEY: ${{ secrets.FRAGELLA_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -30,11 +32,10 @@ jobs:
           EPARFUME_PASSWORD: ${{ secrets.EPARFUME_PASSWORD }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
       - name: Enrich fragrance profiles
-        if: ${{ secrets.FRAGELLA_API_KEY != '' }}
+        if: ${{ env.FRAGELLA_API_KEY != '' }}
         run: npm run enrich:catalog
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-          FRAGELLA_API_KEY: ${{ secrets.FRAGELLA_API_KEY }}
           ENRICHMENT_BATCH_SIZE: ${{ vars.ENRICHMENT_BATCH_SIZE || '20' }}
       - name: Recalculate prices
         run: npm run price:catalog
