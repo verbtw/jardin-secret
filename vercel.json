@@ -4,6 +4,9 @@
   "functions": {
     "api/daily-sync.ts": {
       "maxDuration": 300
+    },
+    "api/perfume-image.ts": {
+      "maxDuration": 30
     }
   },
   "routes": [

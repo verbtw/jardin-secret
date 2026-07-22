@@ -31,7 +31,7 @@ it('enriches every volume variant of an exact fragrance profile', async () => {
   await expect(runProductEnrichment({repo, provider, limit: 10})).resolves.toEqual({
     requested: 1, matched: 1, variantsVerified: 2, review: 0,
   });
-  expect(provider.search).toHaveBeenCalledWith('Tom Ford Oud Wood');
+  expect(provider.search).toHaveBeenCalledWith('Tom Ford Oud Wood', profile);
   expect(repo.saved[0].details).toMatchObject({
     fragranceFamily: 'Древесные',
     topNotes: ['Палисандр'],
@@ -67,4 +67,15 @@ it('does not request profiles after the provider quota is exhausted', async () =
   });
   expect(list).not.toHaveBeenCalled();
   expect(provider.search).not.toHaveBeenCalled();
+});
+
+it('includes a flanker in matching and updates only that profile', async () => {
+  const profile = {brand: 'Tom Ford', name: 'Oud Wood', flanker: 'Intense', concentration: 'EDP'};
+  const repo = new MemoryRepository([profile]);
+  const intense = {...record, _id: 'oud-wood-intense', Name: 'Oud Wood Intense'};
+  const provider = {search: vi.fn().mockResolvedValue([intense])};
+
+  await expect(runProductEnrichment({repo, provider, limit: 1})).resolves.toMatchObject({matched: 1});
+  expect(provider.search).toHaveBeenCalledWith('Tom Ford Oud Wood Intense', profile);
+  expect(repo.saved[0].profile.flanker).toBe('Intense');
 });

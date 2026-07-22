@@ -9,11 +9,13 @@ export interface FragellaFragrance {
   'General Notes'?: string[];
   'Main Accords'?: string[];
   Notes?: {Top?: string[]; Middle?: string[]; Base?: string[]};
+  'Source URL'?: string;
 }
 
 export interface FragranceProfileQuery {
   brand: string;
   name: string;
+  flanker?: string | null;
   concentration: string | null;
 }
 
@@ -93,7 +95,7 @@ function normalizeConcentration(value: string | null | undefined) {
 
 export function selectFragellaMatch(profile: FragranceProfileQuery, candidates: FragellaFragrance[]) {
   const brand = normalize(profile.brand);
-  const name = normalize(profile.name);
+  const name = normalize([profile.name, profile.flanker].filter(Boolean).join(' '));
   const concentration = normalizeConcentration(profile.concentration);
   return candidates.find((candidate) => {
     if (normalize(candidate.Brand) !== brand || normalize(candidate.Name) !== name) return false;
@@ -132,7 +134,9 @@ export function buildRussianDescription(fragrance: FragellaFragrance) {
     return `${firstSentence} В композиции раскрываются ${joinRussian(opening)}, а завершение формируют ${joinRussian(base)}.`;
   }
   const keyNotes = (fragrance['General Notes'] ?? []).slice(0, 4).map(translatedNote);
-  return keyNotes.length ? `${firstSentence} Основные ноты: ${joinRussian(keyNotes)}.` : firstSentence;
+  return keyNotes.length
+    ? `${firstSentence} Основные ноты: ${joinRussian(keyNotes)}. Композиция раскрывается постепенно и сохраняет характер выбранного направления.`
+    : firstSentence;
 }
 
 export class FragellaClient {
