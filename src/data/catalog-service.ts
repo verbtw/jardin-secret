@@ -29,10 +29,12 @@ export interface PublicCatalogRow {
 interface CatalogClient {
   from(table: string): {
     select(columns: string): {
-      order(column: string, options: {ascending: boolean}): PromiseLike<{
-        data: PublicCatalogRow[] | null;
-        error: {message: string} | null;
-      }>;
+      order(column: string, options: {ascending: boolean}): {
+        range(from: number, to: number): PromiseLike<{
+          data: PublicCatalogRow[] | null;
+          error: {message: string} | null;
+        }>;
+      };
     };
   };
 }
@@ -79,7 +81,15 @@ export function mapCatalogRow(row: PublicCatalogRow): Product {
 }
 
 export async function loadPublicCatalog(client: CatalogClient): Promise<Product[]> {
-  const {data, error} = await client.from('public_catalog').select(catalogColumns).order('updated_at', {ascending: false});
-  if (error) throw new Error('Не удалось загрузить каталог');
-  return (data ?? []).map(mapCatalogRow);
+  const pageSize = 1_000;
+  const rows: PublicCatalogRow[] = [];
+  for (let from = 0; ; from += pageSize) {
+    const {data, error} = await client.from('public_catalog').select(catalogColumns)
+      .order('updated_at', {ascending: false}).range(from, from + pageSize - 1);
+    if (error) throw new Error('Не удалось загрузить каталог');
+    const page = data ?? [];
+    rows.push(...page);
+    if (page.length < pageSize) break;
+  }
+  return rows.map(mapCatalogRow);
 }

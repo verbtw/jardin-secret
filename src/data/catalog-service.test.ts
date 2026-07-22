@@ -21,12 +21,35 @@ describe('public catalog service', () => {
   });
 
   it('returns database products and fails closed on query errors', async () => {
-    const order = vi.fn().mockResolvedValue({data: [], error: null});
+    const range = vi.fn().mockResolvedValue({data: [], error: null});
+    const order = vi.fn().mockReturnValue({range});
     const select = vi.fn().mockReturnValue({order});
     const client = {from: vi.fn().mockReturnValue({select})};
     await expect(loadPublicCatalog(client)).resolves.toEqual([]);
 
-    order.mockResolvedValueOnce({data: null, error: {message: 'nope'}});
+    range.mockResolvedValueOnce({data: null, error: {message: 'nope'}});
     await expect(loadPublicCatalog(client)).rejects.toThrow('Не удалось загрузить каталог');
+  });
+
+  it('loads every PostgREST page instead of stopping at the first 1000 products', async () => {
+    const row = {
+      id: '1', slug: 'sample-edp-50ml', brand: 'Sample', name: 'Scent', flanker: null,
+      concentration: 'EDP', volume_ml: 50, retail_price_rub: 10_000, price_status: 'published' as const,
+      availability: 'in_stock' as const, description: 'Описание аромата достаточной длины для карточки магазина.',
+      fragrance_family: 'Древесные', top_notes: ['Бергамот'], heart_notes: [], base_notes: [],
+      key_notes: [], key_accords: [], perfumers: [], launch_year: null,
+      image_url: 'https://example.com/image.jpg', details_source_url: 'https://example.com/source',
+      details_status: 'verified', updated_at: '2026-07-23T00:00:00Z',
+    };
+    const range = vi.fn()
+      .mockResolvedValueOnce({data: Array.from({length: 1000}, (_, id) => ({...row, id: String(id)})), error: null})
+      .mockResolvedValueOnce({data: [{...row, id: '1000'}], error: null});
+    const client = {from: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({order: vi.fn().mockReturnValue({range})}),
+    })};
+
+    await expect(loadPublicCatalog(client)).resolves.toHaveLength(1001);
+    expect(range).toHaveBeenNthCalledWith(1, 0, 999);
+    expect(range).toHaveBeenNthCalledWith(2, 1000, 1999);
   });
 });

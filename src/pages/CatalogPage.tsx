@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CatalogControls } from '../components/CatalogControls';
 import { ProductGrid } from '../components/ProductGrid';
@@ -17,14 +17,20 @@ function queryFromParams(params: URLSearchParams): CatalogQuery {
 }
 
 export function CatalogPage() {
+  const pageSize = 48;
   const [params, setParams] = useSearchParams();
+  const [visibleCount, setVisibleCount] = useState(pageSize);
   const allProducts = useCatalogProducts();
   const brands = useMemo(
     () => [...new Set(allProducts.map((product) => product.brand))].sort((a, b) => a.localeCompare(b)),
     [allProducts],
   );
   const query = queryFromParams(params);
-  const products = useMemo(() => filterProducts(allProducts, query), [params.toString()]);
+  const queryKey = params.toString();
+  const products = useMemo(() => filterProducts(allProducts, query), [allProducts, queryKey]);
+  const visibleProducts = products.slice(0, visibleCount);
+
+  useEffect(() => setVisibleCount(pageSize), [queryKey, allProducts]);
 
   function update(next: CatalogQuery) {
     const output = new URLSearchParams();
@@ -45,7 +51,14 @@ export function CatalogPage() {
       </header>
       <CatalogControls query={query} brands={brands} onChange={update} onReset={() => setParams({}, { replace: true })} />
       <p className="result-count" aria-live="polite">Найдено: {products.length}</p>
-      <ProductGrid products={products} onReset={() => setParams({}, { replace: true })} />
+      <ProductGrid products={visibleProducts} onReset={() => setParams({}, { replace: true })} />
+      {visibleCount < products.length && (
+        <div className="catalog-load-more" style={{display: 'flex', justifyContent: 'center', margin: '-58px 20px 100px'}}>
+          <button className="button button--outline" type="button" onClick={() => setVisibleCount((count) => count + pageSize)}>
+            Показать ещё
+          </button>
+        </div>
+      )}
     </main>
   );
 }
