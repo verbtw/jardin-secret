@@ -1,15 +1,16 @@
 import { ArrowLeft, Send } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import { buildManagerUrl } from '../domain/telegram-order';
-import { useCatalogProducts } from '../hooks/useCatalogProducts';
+import { useCatalogState } from '../hooks/useCatalogProducts';
 import { FragranceNotes } from '../components/FragranceNotes';
 
 const rubles = new Intl.NumberFormat('ru-RU');
 
 export function ProductPage() {
-  const products = useCatalogProducts();
+  const {products, isLoading} = useCatalogState();
   const { slug } = useParams();
   const product = products.find((item) => item.slug === slug);
+  if (!product && isLoading) return <main className="empty-page"><p className="eyebrow">Каталог</p><h1>Загружаем аромат…</h1></main>;
   if (!product) return <main className="empty-page"><p className="eyebrow">404</p><h1>Аромат не найден</h1><Link className="button" to="/catalog">Вернуться в каталог</Link></main>;
   return (
     <main className="product-page">
