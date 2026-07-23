@@ -18,15 +18,14 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
 
     await card.getByRole('link').first().click();
     await expect(page).toHaveURL(/\/product\//);
-    const productOrderLink = page.getByRole('link', {name: 'Написать менеджеру'});
+    const productOrderLink = page.getByRole('link', {name: 'Написать менеджеру', exact: true});
     const productOrderUrl = new URL(await productOrderLink.getAttribute('href') ?? '');
     expect(productOrderUrl.searchParams.get('text')).toContain(productName);
     expect(productOrderUrl.searchParams.get('text')).toContain(page.url());
 
     await page.goto('/register');
     await expect(page.getByRole('heading', {name: 'Создайте свой профиль'})).toBeVisible();
-    await expect(page.getByText('Личный кабинет настраивается. Каталог и заказ через Telegram доступны без регистрации.')).toBeVisible();
-    await expect(page.getByRole('button', {name: 'Создать аккаунт'})).toBeDisabled();
+    await expect(page.getByRole('button', {name: 'Создать аккаунт'})).toBeVisible();
     expect(consoleErrors).toEqual([]);
   });
 }
