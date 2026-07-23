@@ -1,8 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { expect, it } from 'vitest';
+import { beforeEach, expect, it, vi } from 'vitest';
 import { getProducts } from '../data/catalog';
 import { ProductPage } from './ProductPage';
+
+const {useCatalogState} = vi.hoisted(() => ({useCatalogState: vi.fn()}));
+vi.mock('../hooks/useCatalogProducts', () => ({useCatalogState}));
+
+beforeEach(() => {
+  useCatalogState.mockReturnValue({products: getProducts(), isLoading: false});
+});
 
 it('opens Telegram with the current product already named', () => {
   const product = getProducts()[0];
@@ -14,3 +21,10 @@ it('opens Telegram with the current product already named', () => {
   expect(screen.queryByRole('button', {name: /Добавить в корзину/})).not.toBeInTheDocument();
 });
 
+it('shows a loading state instead of a false 404 while the remote product is loading', () => {
+  useCatalogState.mockReturnValue({products: getProducts(), isLoading: true});
+  render(<MemoryRouter initialEntries={['/product/remote-scent-edp-50ml']}><Routes><Route path="/product/:slug" element={<ProductPage />} /></Routes></MemoryRouter>);
+
+  expect(screen.getByText('Загружаем аромат…')).toBeInTheDocument();
+  expect(screen.queryByText('Аромат не найден')).not.toBeInTheDocument();
+});

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { getProducts } from './catalog';
 
 describe('getProducts', () => {
-  it('returns products without legacy Telegram editorial copy', () => {
+  it('does not expose legacy Telegram sales copy as a fragrance description', () => {
     const products = getProducts();
     expect(products.length).toBeGreaterThan(0);
     expect(products[0]).toMatchObject({
