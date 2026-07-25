@@ -2,6 +2,7 @@ import { Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { buildManagerUrl } from '../domain/telegram-order';
 import type { Product } from '../types/product';
+import { ProductImage } from './ProductImage';
 
 const rubles = new Intl.NumberFormat('ru-RU');
 
@@ -9,7 +10,7 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <article className="product-card" data-testid="product-card">
       <Link className="product-card__image" to={`/product/${product.slug}`} aria-label={`${product.brand} ${product.name}`}>
-        <img src={product.imageUrl} alt={`${product.brand} ${product.name}`} loading="lazy" onError={(event) => { event.currentTarget.src = '/products/placeholder.svg'; }} />
+        <ProductImage src={product.imageUrl} alt={`${product.brand} ${product.name}`} variant="card" />
       </Link>
       <div className="product-card__body">
         <p className="product-card__brand">{product.brand}</p>
