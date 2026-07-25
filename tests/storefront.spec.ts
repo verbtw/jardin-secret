@@ -21,7 +21,7 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
 
     await card.getByRole('link').first().click();
     await expect(page).toHaveURL(/\/product\//);
-    const detailImage = page.getByTestId('product-image');
+    const detailImage = page.locator('.product-image--detail');
     await expect(detailImage).toHaveClass(/product-image--detail/);
     await expect(detailImage.locator('img')).toHaveCSS('object-fit', 'contain');
     const productOrderLink = page.getByRole('link', {name: 'Написать менеджеру', exact: true});
