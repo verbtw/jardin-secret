@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
 import { ProductImage } from './ProductImage';
+import productImageCss from '../product-images.css?raw';
 
 it('uses the shared card frame and lazy loading', () => {
   render(<ProductImage src="/bottle.jpg" alt="Maison Test Scent" variant="card" />);
@@ -26,10 +26,8 @@ it('falls back to the branded placeholder once when an image fails', () => {
 });
 
 it('keeps every image contained inside the shared studio surface', () => {
-  const css = readFileSync(`${process.cwd()}/src/product-images.css`, 'utf8');
-
-  expect(css).toMatch(/\.product-image__media[^}]*object-fit:\s*contain/);
-  expect(css).toMatch(/\.product-image--card/);
-  expect(css).toMatch(/\.product-image--detail/);
-  expect(css).toMatch(/\.product-image--compact/);
+  expect(productImageCss).toMatch(/\.product-image__media[^}]*object-fit:\s*contain/);
+  expect(productImageCss).toMatch(/\.product-image--card/);
+  expect(productImageCss).toMatch(/\.product-image--detail/);
+  expect(productImageCss).toMatch(/\.product-image--compact/);
 });
