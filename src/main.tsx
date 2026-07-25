@@ -12,6 +12,7 @@ import './review-form.css';
 import './account-orders.css';
 import './admin.css';
 import './admin-order.css';
+import './product-images.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode><App /></StrictMode>,

@@ -12,6 +12,8 @@ const product: Product = {
 
 it('offers a prefilled manager message instead of a cart action', () => {
   render(<MemoryRouter><ProductCard product={product} /></MemoryRouter>);
+  expect(screen.getByTestId('product-image')).toHaveClass('product-image--card');
+  expect(screen.getByRole('img', {name: 'Tom Ford Oud Wood'})).toHaveAttribute('src', product.imageUrl);
   const link = screen.getByRole('link', {name: 'Написать менеджеру о Oud Wood'});
   expect(new URL(link.getAttribute('href')!).searchParams.get('text')).toContain('Tom Ford Oud Wood, EDP, 50 мл');
   expect(screen.queryByRole('button', {name: /Добавить/})).not.toBeInTheDocument();

@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { buildManagerUrl } from '../domain/telegram-order';
 import { useCatalogState } from '../hooks/useCatalogProducts';
 import { FragranceNotes } from '../components/FragranceNotes';
+import { ProductImage } from '../components/ProductImage';
 
 const rubles = new Intl.NumberFormat('ru-RU');
 
@@ -16,7 +17,7 @@ export function ProductPage() {
     <main className="product-page">
       <Link className="back-link" to="/catalog"><ArrowLeft size={16} />Назад в каталог</Link>
       <div className="product-detail">
-        <div className="product-detail__image"><img src={product.imageUrl} alt={`${product.brand} ${product.name}`} onError={(event) => { event.currentTarget.src = '/products/placeholder.svg'; }} /></div>
+        <ProductImage src={product.imageUrl} alt={`${product.brand} ${product.name}`} variant="detail" className="product-detail__image" />
         <div className="product-detail__copy">
           <p className="eyebrow">{product.brand}</p><h1>{product.name}</h1>
           <p className="product-detail__price">{product.priceRub ? `${rubles.format(product.priceRub)} ₽` : 'Цену уточнит менеджер'}</p>

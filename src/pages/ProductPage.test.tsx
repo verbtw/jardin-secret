@@ -14,6 +14,8 @@ beforeEach(() => {
 it('opens Telegram with the current product already named', () => {
   const product = getProducts()[0];
   render(<MemoryRouter initialEntries={[`/product/${product.slug}`]}><Routes><Route path="/product/:slug" element={<ProductPage />} /></Routes></MemoryRouter>);
+  expect(screen.getByTestId('product-image')).toHaveClass('product-image--detail');
+  expect(screen.getByRole('img', {name: `${product.brand} ${product.name}`})).toHaveAttribute('loading', 'eager');
   const link = screen.getByRole('link', {name: 'Написать менеджеру'});
   const text = new URL(link.getAttribute('href')!).searchParams.get('text');
   expect(text).toContain(`${product.brand} ${product.name}`);
