@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { resolve } from 'node:path';
+import sharp from 'sharp';
 import { getProducts } from './catalog';
+import legacyPackshots from './legacy-packshots.json';
 
 describe('getProducts', () => {
   it('replaces legacy Telegram sales copy with curated fragrance details', () => {
@@ -26,6 +29,14 @@ describe('getProducts', () => {
       expect(product.sourceUrl, product.slug).toMatch(/^https:\/\//);
       expect(product.imageUrl, product.slug).not.toContain('placeholder');
       expect(product.imageUrl, product.slug).toMatch(/^(?:https:\/\/|\/products\/)/);
+      expect(product.imageUrl, product.slug).not.toMatch(/^\/products\/\d+\.jpg$/);
+    }
+  });
+
+  it('normalizes every sourced packshot to the same square studio canvas', async () => {
+    for (const { imageUrl } of Object.values(legacyPackshots)) {
+      const metadata = await sharp(resolve('public', imageUrl.replace(/^\//, ''))).metadata();
+      expect([metadata.width, metadata.height], imageUrl).toEqual([1600, 1600]);
     }
   });
 });

@@ -26,7 +26,11 @@ it('falls back to the branded placeholder once when an image fails', () => {
 });
 
 it('keeps every image contained inside the shared studio surface', () => {
+  render(<ProductImage src="/portrait-bottle.jpg" alt="Tall bottle" variant="card" />);
+
+  expect(screen.getByTestId('product-image').querySelector('.product-image__stage')).toBeInTheDocument();
   expect(productImageCss).toMatch(/\.product-image__media[^}]*object-fit:\s*contain/);
+  expect(productImageCss).toMatch(/\.product-image__media[^}]*position:\s*absolute/);
   expect(productImageCss).toMatch(/\.product-image--card/);
   expect(productImageCss).toMatch(/\.product-image--detail/);
   expect(productImageCss).toMatch(/\.product-image--compact/);

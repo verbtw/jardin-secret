@@ -12,16 +12,18 @@ export function ProductImage({src, alt, variant, className = ''}: ProductImagePr
 
   return (
     <div className={classes} data-testid="product-image">
-      <span className="product-image__shadow" aria-hidden="true" />
-      <img
-        className="product-image__media"
-        src={src}
-        alt={alt}
-        loading={variant === 'detail' ? 'eager' : 'lazy'}
-        onError={(event) => {
-          if (!event.currentTarget.src.endsWith(placeholder)) event.currentTarget.src = placeholder;
-        }}
-      />
+      <div className="product-image__stage">
+        <span className="product-image__shadow" aria-hidden="true" />
+        <img
+          className="product-image__media"
+          src={src}
+          alt={alt}
+          loading={variant === 'detail' ? 'eager' : 'lazy'}
+          onError={(event) => {
+            if (!event.currentTarget.src.endsWith(placeholder)) event.currentTarget.src = placeholder;
+          }}
+        />
+      </div>
     </div>
   );
 }

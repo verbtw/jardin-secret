@@ -308,7 +308,7 @@ async function main() {
         fragranceFamily: family, topNotes: [], heartNotes: [], baseNotes: [], keyNotes: notes,
         accords: record.accords, perfumers: [],
         launchYear: alias.year ?? (Number.parseInt(record.year, 10) || null),
-        imageUrl: enriched.imageUrl.includes('placeholder') && entry
+        imageUrl: entry
           ? buildArchiveImageUrl(IMAGE_BASE_URL, archiveName, entry) : enriched.imageUrl,
         sourceUrl: alias.sourceUrl ?? DATASET_SOURCE,
       };
@@ -325,7 +325,7 @@ async function main() {
       topNotes: manual.top ?? [], heartNotes: manual.heart ?? [], baseNotes: manual.base ?? [],
       keyNotes: manual.key ?? [], accords: manual.accords ?? [], perfumers: manual.perfumers ?? [],
       launchYear: manual.year ?? null,
-      imageUrl: manual.imageUrl ?? (enriched.imageUrl.includes('placeholder') && manualArchiveEntry
+      imageUrl: manual.imageUrl ?? (manualArchiveEntry
         ? buildArchiveImageUrl(IMAGE_BASE_URL, manual.imageArchiveName!, manualArchiveEntry)
         : enriched.imageUrl),
       sourceUrl: manual.sourceUrl,
