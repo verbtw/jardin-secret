@@ -10,6 +10,9 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
     const cards = page.getByTestId('product-card');
     await expect(cards).not.toHaveCount(0);
     const card = cards.first();
+    const cardImage = card.getByTestId('product-image');
+    await expect(cardImage).toHaveClass(/product-image--card/);
+    await expect(cardImage.locator('img')).toHaveCSS('object-fit', 'contain');
     const productName = await card.getByRole('heading', {level: 3}).textContent();
     const cardOrderLink = card.getByRole('link', {name: /Написать менеджеру о/});
     const cardOrderUrl = new URL(await cardOrderLink.getAttribute('href') ?? '');
@@ -18,6 +21,9 @@ for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844
 
     await card.getByRole('link').first().click();
     await expect(page).toHaveURL(/\/product\//);
+    const detailImage = page.getByTestId('product-image');
+    await expect(detailImage).toHaveClass(/product-image--detail/);
+    await expect(detailImage.locator('img')).toHaveCSS('object-fit', 'contain');
     const productOrderLink = page.getByRole('link', {name: 'Написать менеджеру', exact: true});
     const productOrderUrl = new URL(await productOrderLink.getAttribute('href') ?? '');
     expect(productOrderUrl.searchParams.get('text')).toContain(productName);
