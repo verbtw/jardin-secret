@@ -13,6 +13,7 @@ import './account-orders.css';
 import './admin.css';
 import './admin-order.css';
 import './product-images.css';
+import './brand-identity.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode><App /></StrictMode>,
