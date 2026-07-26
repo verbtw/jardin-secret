@@ -19,7 +19,7 @@ export function ProductPage() {
       <div className="product-detail">
         <ProductImage src={product.imageUrl} alt={`${product.brand} ${product.name}`} variant="detail" className="product-detail__image" />
         <div className="product-detail__copy">
-          <p className="eyebrow">{product.brand}</p><h1>{product.name}</h1>
+          <p className="product-detail__brand product-brand-text">{product.brand}</p><h1 className="product-name-text">{product.name}</h1>
           <p className="product-detail__price">{product.priceRub ? `${rubles.format(product.priceRub)} ₽` : 'Цену уточнит менеджер'}</p>
           <div className="detail-facts"><span><small>Объём</small>{product.volumeMl ? `${product.volumeMl} мл` : 'Уточнить'}</span><span><small>Наличие</small>{product.availability === 'in-stock' ? 'В наличии' : 'Уточнить'}</span><span><small>Оригинальность</small>100% оригинал</span></div>
           {product.description && <p className="product-description">{product.description}</p>}

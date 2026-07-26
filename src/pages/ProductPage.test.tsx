@@ -20,6 +20,8 @@ it('opens Telegram with the current product already named', () => {
   const text = new URL(link.getAttribute('href')!).searchParams.get('text');
   expect(text).toContain(`${product.brand} ${product.name}`);
   expect(text).toContain(`/product/${product.slug}`);
+  expect(screen.getByText(product.brand)).toHaveClass('product-brand-text');
+  expect(screen.getByRole('heading', {name: product.name})).toHaveClass('product-name-text');
   expect(screen.queryByRole('button', {name: /Добавить в корзину/})).not.toBeInTheDocument();
 });
 

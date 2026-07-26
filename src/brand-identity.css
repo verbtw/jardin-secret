@@ -25,6 +25,27 @@
   height: 68px;
 }
 
+.product-brand-text,
+.product-name-text,
+.catalog-brand-select {
+  text-transform: lowercase;
+}
+
+.product-card__brand,
+.product-detail__brand {
+  font: 500 11px/1.2 'Manrope', sans-serif;
+  letter-spacing: 0;
+  color: var(--leaf);
+}
+
+.product-card__brand {
+  margin: 0 0 8px;
+}
+
+.product-detail__brand {
+  margin: 0 0 17px;
+}
+
 @media (max-width: 600px) {
   .site-header .brand-logo {
     width: 105px;

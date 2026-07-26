@@ -13,8 +13,8 @@ export function ProductCard({ product }: { product: Product }) {
         <ProductImage src={product.imageUrl} alt={`${product.brand} ${product.name}`} variant="card" />
       </Link>
       <div className="product-card__body">
-        <p className="product-card__brand">{product.brand}</p>
-        <h3><Link to={`/product/${product.slug}`}>{product.name}</Link></h3>
+        <p className="product-card__brand product-brand-text">{product.brand}</p>
+        <h3><Link className="product-name-text" to={`/product/${product.slug}`}>{product.name}</Link></h3>
         <p className="product-card__meta">{product.volumeMl ? `${product.volumeMl} мл` : 'Объём уточнить'}</p>
         <div className="product-card__bottom">
           <strong>{product.priceRub ? `${rubles.format(product.priceRub)} ₽` : 'Уточнить'}</strong>
