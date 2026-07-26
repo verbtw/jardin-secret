@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { expect, it } from 'vitest';
 import { ProductCard } from './ProductCard';
 import type { Product } from '../types/product';
+import brandIdentityCss from '../brand-identity.css?raw';
 
 const product: Product = {
   id: 'product-1', slug: 'tom-ford-oud-wood-50', brand: 'Tom Ford', name: 'Oud Wood',
@@ -17,4 +18,13 @@ it('offers a prefilled manager message instead of a cart action', () => {
   const link = screen.getByRole('link', {name: 'Написать менеджеру о Oud Wood'});
   expect(new URL(link.getAttribute('href')!).searchParams.get('text')).toContain('Tom Ford Oud Wood, EDP, 50 мл');
   expect(screen.queryByRole('button', {name: /Добавить/})).not.toBeInTheDocument();
+});
+
+it('marks the visible brand and fragrance name for lowercase presentation', () => {
+  render(<MemoryRouter><ProductCard product={product} /></MemoryRouter>);
+
+  expect(screen.getByText('Tom Ford')).toHaveClass('product-brand-text');
+  expect(screen.getByText('Oud Wood')).toHaveClass('product-name-text');
+  expect(brandIdentityCss).toMatch(/\.product-brand-text[^}]*text-transform:\s*lowercase/);
+  expect(brandIdentityCss).toMatch(/\.product-name-text[^}]*text-transform:\s*lowercase/);
 });
