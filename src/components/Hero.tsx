@@ -11,9 +11,10 @@ export function Hero() {
         <p className="hero__lead">Редкие и любимые ароматы без переплаты крупным сетям. Поможем выбрать тот самый.</p>
         <div className="hero__actions"><Link className="button" to="/catalog">Смотреть каталог <ArrowDownRight size={17} /></Link><a className="text-link" href="https://t.me/jardinmanager" target="_blank" rel="noreferrer" aria-label="Написать менеджеру"><Send size={16} />Написать менеджеру</a></div>
       </div>
-      <div className="hero__art" aria-hidden="true">
-        <div className="glass-orb"><span className="orb-light" /><div className="perfume-cap" /><div className="perfume-bottle"><span>JARDIN</span><i>secret</i><small>eau de parfum</small></div></div>
-        <span className="botanical botanical--one" /><span className="botanical botanical--two" />
+      <div className="hero__art" aria-hidden="true" data-testid="hero-media">
+        <div className="hero__media">
+          <img className="hero__photo" src="/hero/editorial-perfume.webp" alt="" role="presentation" onError={(event) => { event.currentTarget.hidden = true; }} />
+        </div>
       </div>
       <div className="hero__index"><span>01</span><i /><span>Найдите свой аромат</span></div>
     </section>
