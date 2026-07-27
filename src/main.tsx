@@ -14,6 +14,7 @@ import './admin.css';
 import './admin-order.css';
 import './product-images.css';
 import './brand-identity.css';
+import './hero-art.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode><App /></StrictMode>,
