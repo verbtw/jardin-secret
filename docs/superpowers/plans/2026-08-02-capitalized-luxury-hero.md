@@ -12,7 +12,7 @@
 
 - Preserve existing layout and responsive behavior.
 - Use no third-party branding, labels, text or watermarks in the hero artwork.
-- Preserve source capitalization instead of mechanically title-casing product data.
+- Apply visual Title Case without rewriting product data.
 
 ---
 
@@ -23,7 +23,7 @@
 - Modify: `src/components/ProductCard.test.tsx`
 - Modify: `src/components/Hero.test.tsx`
 
-- [ ] Write assertions for `Jardin`, `Secret`, `text-transform: none` and `/hero/luxury-filled-perfume.webp`.
+- [ ] Write assertions for `Jardin`, `Secret`, `text-transform: capitalize` and `/hero/luxury-filled-perfume.webp`.
 - [ ] Run `npm test -- --run src/components/BrandLogo.test.tsx src/components/ProductCard.test.tsx src/components/Hero.test.tsx` and confirm failures describe the old presentation.
 
 ### Task 2: Implement the visual correction
@@ -35,7 +35,7 @@
 - Create: `public/hero/luxury-filled-perfume.webp`
 
 - [ ] Capitalize both SVG words and update its accessible title.
-- [ ] Change the shared product typography rule to `text-transform: none`.
+- [ ] Change the shared product typography rule to `text-transform: capitalize`.
 - [ ] Point Hero at the new filled-bottle artwork.
 - [ ] Generate and add the optimized WebP hero asset.
 - [ ] Run focused tests and confirm they pass.
