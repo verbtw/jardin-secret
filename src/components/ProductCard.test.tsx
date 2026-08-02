@@ -20,11 +20,11 @@ it('offers a prefilled manager message instead of a cart action', () => {
   expect(screen.queryByRole('button', {name: /Добавить/})).not.toBeInTheDocument();
 });
 
-it('marks the visible brand and fragrance name for lowercase presentation', () => {
+it('preserves the capitalization of the visible brand and fragrance name', () => {
   render(<MemoryRouter><ProductCard product={product} /></MemoryRouter>);
 
   expect(screen.getByText('Tom Ford')).toHaveClass('product-brand-text');
   expect(screen.getByText('Oud Wood')).toHaveClass('product-name-text');
-  expect(brandIdentityCss).toMatch(/\.product-brand-text[^}]*text-transform:\s*lowercase/);
-  expect(brandIdentityCss).toMatch(/\.product-name-text[^}]*text-transform:\s*lowercase/);
+  expect(brandIdentityCss).toMatch(/\.product-brand-text[^}]*text-transform:\s*none/);
+  expect(brandIdentityCss).toMatch(/\.product-name-text[^}]*text-transform:\s*none/);
 });

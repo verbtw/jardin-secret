@@ -13,7 +13,7 @@ export function Hero() {
       </div>
       <div className="hero__art" aria-hidden="true" data-testid="hero-media">
         <div className="hero__media">
-          <img className="hero__photo" src="/hero/editorial-perfume.webp" alt="" role="presentation" onError={(event) => { event.currentTarget.hidden = true; }} />
+          <img className="hero__photo" src="/hero/luxury-filled-perfume.webp" alt="" role="presentation" onError={(event) => { event.currentTarget.hidden = true; }} />
         </div>
       </div>
       <div className="hero__index"><span>01</span><i /><span>Найдите свой аромат</span></div>

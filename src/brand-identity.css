@@ -28,7 +28,7 @@
 .product-brand-text,
 .product-name-text,
 .catalog-brand-select {
-  text-transform: lowercase;
+  text-transform: none;
 }
 
 .product-card__brand,

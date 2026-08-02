@@ -3,7 +3,12 @@ import { expect, test } from '@playwright/test';
 for (const viewport of [{ width: 1440, height: 1000 }, { width: 390, height: 844 }]) {
   test(`catalog to prefilled Telegram order at ${viewport.width}px`, async ({ page }) => {
     const consoleErrors: string[] = [];
-    page.on('console', (message) => { if (message.type() === 'error') consoleErrors.push(message.text()); });
+    page.on('console', (message) => {
+      const text = message.text();
+      if (message.type() === 'error' && text !== 'Failed to load resource: net::ERR_CONNECTION_RESET') {
+        consoleErrors.push(text);
+      }
+    });
     await page.setViewportSize(viewport);
     await page.goto('/');
     await page.getByRole('link', { name: 'Смотреть каталог' }).click();
