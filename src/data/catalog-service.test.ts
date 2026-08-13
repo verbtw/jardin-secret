@@ -7,6 +7,7 @@ describe('public catalog service', () => {
       id: '1', slug: 'diptyque-philosykos-edp-75ml', brand: 'Diptyque', name: 'Philosykos',
       flanker: null, concentration: 'EDP', volume_ml: 75, retail_price_rub: 18_900,
       price_status: 'published', availability: 'in_stock', description: 'Зелёный древесный аромат.',
+      gender: 'unisex',
       fragrance_family: 'Древесные фужерные', top_notes: ['Лист инжира'], heart_notes: ['Инжир'],
       base_notes: ['Кедр'], key_notes: [], key_accords: ['зелёный'], perfumers: ['Olivia Giacobetti'],
       launch_year: 1996, image_url: 'https://example.com/image.jpg',
@@ -15,7 +16,7 @@ describe('public catalog service', () => {
     });
 
     expect(product).toEqual(expect.objectContaining({
-      priceRub: 18_900, availability: 'in-stock', concentration: 'EDP',
+      priceRub: 18_900, availability: 'in-stock', concentration: 'EDP', gender: 'unisex',
       topNotes: ['Лист инжира'], notes: ['Лист инжира', 'Инжир', 'Кедр'],
     }));
   });
@@ -36,6 +37,7 @@ describe('public catalog service', () => {
       id: '1', slug: 'sample-edp-50ml', brand: 'Sample', name: 'Scent', flanker: null,
       concentration: 'EDP', volume_ml: 50, retail_price_rub: 10_000, price_status: 'published' as const,
       availability: 'in_stock' as const, description: 'Описание аромата достаточной длины для карточки магазина.',
+      gender: 'women' as const,
       fragrance_family: 'Древесные', top_notes: ['Бергамот'], heart_notes: [], base_notes: [],
       key_notes: [], key_accords: [], perfumers: [], launch_year: null,
       image_url: 'https://example.com/image.jpg', details_source_url: 'https://example.com/source',

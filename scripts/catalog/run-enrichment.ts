@@ -7,6 +7,7 @@ import {
   type FragranceProfileQuery,
 } from './fragella-client.js';
 import {validateDetails, type FragranceDetails} from './enrich-products.js';
+import {normalizeProductGender} from './gender.js';
 
 export type EnrichmentProfile = FragranceProfileQuery;
 
@@ -43,6 +44,7 @@ export function mapFragellaDetails(fragrance: FragellaFragrance): FragranceDetai
   return {
     description: buildRussianDescription(fragrance),
     fragranceFamily: translateFamily(fragrance['Main Accords']?.[0] ?? ''),
+    gender: normalizeProductGender(fragrance.Gender),
     topNotes,
     heartNotes,
     baseNotes,

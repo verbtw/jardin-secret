@@ -19,6 +19,7 @@ describe('open perfume dataset', () => {
       family: 'WOODY',
       accords: ['WOODY', 'Woody', 'Spicy'],
       ingredients: ['Oud', 'Sandalwood', 'Amber'],
+      gender: 'Unisex',
       year: '2007',
       imageName: 'oud-wood.jpg',
     }]);
@@ -70,6 +71,7 @@ describe('open perfume dataset', () => {
         Brand: 'Tom Ford',
         Name: 'Oud Wood',
         Year: '2007',
+        Gender: 'Unisex',
         'General Notes': ['Oud', 'Sandalwood', 'Amber'],
         'Image URL': expect.stringContaining('/api/perfume-image?'),
         'Source URL': 'https://huggingface.co/datasets/doevent/perfume',

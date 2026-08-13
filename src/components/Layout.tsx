@@ -27,7 +27,7 @@ export function Layout() {
         <div className="footer-brand"><BrandLogo light /><p>Оригинальная парфюмерия<br />без лишней наценки.</p></div>
         <div><p className="footer-label">Связаться</p><a href="https://t.me/jardinmanager" target="_blank" rel="noreferrer">Заказать · @jardinmanager</a><a href="https://t.me/jardinnsecret" target="_blank" rel="noreferrer">Канал · @jardinnsecret</a></div>
         <div><p className="footer-label">Больше</p><a href="https://t.me/jardinotzivi" target="_blank" rel="noreferrer">Отзывы · @jardinotzivi</a><a href="https://t.me/aminakulieva" target="_blank" rel="noreferrer">Сотрудничество</a></div>
-        <div className="footer-bottom"><span>© {new Date().getFullYear()} Jardin Secret</span><span>Сайт сделал verbtw</span></div>
+        <div className="footer-bottom"><span>© {new Date().getFullYear()} Jardin Secret</span><span>Developed by <a href="https://t.me/verbtwdev" target="_blank" rel="noreferrer">@verbtwdev</a></span></div>
       </footer>
     </div>
   );

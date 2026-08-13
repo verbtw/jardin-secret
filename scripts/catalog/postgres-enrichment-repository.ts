@@ -1,6 +1,8 @@
 import postgres, {type Sql} from 'postgres';
 import type {FragranceDetails} from './enrich-products.js';
 import type {EnrichmentProfile, EnrichmentRepository} from './run-enrichment.js';
+import type {GenderBackfillRepository, GenderProfile} from './gender-backfill.js';
+import type {ProductGender} from '../../src/types/product.js';
 
 interface ProfileRow {
   brand: string;
@@ -9,7 +11,7 @@ interface ProfileRow {
   concentration: string | null;
 }
 
-export class PostgresEnrichmentRepository implements EnrichmentRepository {
+export class PostgresEnrichmentRepository implements EnrichmentRepository, GenderBackfillRepository {
   private readonly sql: Sql;
 
   constructor(databaseUrl: string, sqlClient?: Sql) {
@@ -28,11 +30,49 @@ export class PostgresEnrichmentRepository implements EnrichmentRepository {
     return rows.map((row) => ({brand: row.brand, name: row.name, flanker: row.flanker, concentration: row.concentration}));
   }
 
+  async listMissingGenderProfiles(limit: number): Promise<GenderProfile[]> {
+    return this.sql<GenderProfile[]>`
+      select distinct on (lower(brand), lower(name), coalesce(lower(flanker), ''))
+        brand, name, flanker
+      from public.products
+      where gender = 'unknown'
+      order by lower(brand), lower(name), coalesce(lower(flanker), ''), created_at
+      limit ${limit}
+    `;
+  }
+
+  async saveGenderAssignments(items: Array<{
+    profile: GenderProfile;
+    gender: Exclude<ProductGender, 'unknown'>;
+  }>) {
+    let updatedCount = 0;
+    for (let start = 0; start < items.length; start += 1_000) {
+      const payload = items.slice(start, start + 1_000).map(({profile, gender}) => ({...profile, gender}));
+      const rows = await this.sql<{id: string}[]>`
+        with assignments as (
+          select * from jsonb_to_recordset(${this.sql.json(payload)}::jsonb) as assignment (
+            brand text, name text, flanker text, gender text
+          )
+        )
+        update public.products product set gender = assignment.gender
+        from assignments assignment
+        where lower(product.brand) = lower(assignment.brand)
+          and lower(product.name) = lower(assignment.name)
+          and coalesce(lower(product.flanker), '') = coalesce(lower(assignment.flanker), '')
+          and product.gender = 'unknown'
+        returning product.id::text
+      `;
+      updatedCount += rows.length;
+    }
+    return updatedCount;
+  }
+
   async saveVerifiedProfile(profile: EnrichmentProfile, details: FragranceDetails) {
     return this.sql.begin(async (transaction) => {
       const products = await transaction<{id: string}[]>`
         update public.products set
           description = ${details.description},
+          gender = ${details.gender},
           fragrance_family = ${details.fragranceFamily},
           top_notes = ${details.topNotes},
           heart_notes = ${details.heartNotes},
@@ -88,6 +128,7 @@ export class PostgresEnrichmentRepository implements EnrichmentRepository {
         flanker: profile.flanker ?? null,
         concentration: profile.concentration,
         description: details.description,
+        gender: details.gender,
         fragrance_family: details.fragranceFamily,
         top_notes: details.topNotes,
         heart_notes: details.heartNotes,
@@ -103,7 +144,7 @@ export class PostgresEnrichmentRepository implements EnrichmentRepository {
         with profiles as (
           select * from jsonb_to_recordset(${this.sql.json(payload)}::jsonb) as profile (
             brand text, name text, flanker text, concentration text,
-            description text, fragrance_family text,
+            description text, gender text, fragrance_family text,
             top_notes jsonb, heart_notes jsonb, base_notes jsonb, key_notes jsonb,
             perfumers jsonb, launch_year integer, image_url text,
             source_url text, source_type text
@@ -111,6 +152,7 @@ export class PostgresEnrichmentRepository implements EnrichmentRepository {
         ), updated as (
           update public.products product set
             description = profile.description,
+            gender = profile.gender,
             fragrance_family = profile.fragrance_family,
             top_notes = array(select jsonb_array_elements_text(profile.top_notes)),
             heart_notes = array(select jsonb_array_elements_text(profile.heart_notes)),

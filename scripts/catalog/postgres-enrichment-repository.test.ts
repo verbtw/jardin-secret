@@ -15,6 +15,7 @@ function fakeSql() {
   }) as unknown as Sql;
   (tag as unknown as {begin: (callback: (sql: Sql) => Promise<unknown>) => Promise<unknown>}).begin = (callback) => callback(tag);
   (tag as unknown as {end: () => Promise<void>}).end = vi.fn().mockResolvedValue(undefined);
+  (tag as unknown as {json: (value: unknown) => unknown}).json = (value) => value;
   return {tag, queries};
 }
 
@@ -35,6 +36,7 @@ it('updates every non-verified variant and records its source', async () => {
     {brand: 'Tom Ford', name: 'Oud Wood', concentration: 'EDP'},
     {
       description: 'Описание', fragranceFamily: 'Древесные', topNotes: ['Бергамот'],
+      gender: 'unisex',
       heartNotes: ['Уд'], baseNotes: ['Амбра'], keyNotes: [], perfumers: [], launchYear: 2007,
       imageUrl: 'https://cdn.example/oud.jpg', sourceUrl: 'https://catalog.example/oud',
       sourceType: 'major_catalog',
@@ -42,5 +44,18 @@ it('updates every non-verified variant and records its source', async () => {
   );
   expect(count).toBe(2);
   expect(queries.some((query) => query.includes("details_status = 'verified'"))).toBe(true);
+  expect(queries.some((query) => query.includes('gender ='))).toBe(true);
   expect(queries.filter((query) => query.includes('insert into private.product_sources'))).toHaveLength(2);
+});
+
+it('lists and updates unknown gender profiles in batches', async () => {
+  const {tag, queries} = fakeSql();
+  const repo = new PostgresEnrichmentRepository('', tag);
+  await repo.listMissingGenderProfiles(100);
+  await repo.saveGenderAssignments([{
+    profile: {brand: 'Tom Ford', name: 'Oud Wood', flanker: null}, gender: 'unisex',
+  }]);
+
+  expect(queries.some((query) => query.includes("gender = 'unknown'"))).toBe(true);
+  expect(queries.some((query) => query.includes('update public.products product set gender'))).toBe(true);
 });

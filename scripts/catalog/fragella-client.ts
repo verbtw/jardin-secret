@@ -3,6 +3,7 @@ export interface FragellaFragrance {
   Name: string;
   Brand: string;
   Year?: string;
+  Gender?: string;
   OilType?: string;
   'Image URL'?: string;
   'Image URL Transparent'?: string;
