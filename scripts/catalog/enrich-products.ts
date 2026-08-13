@@ -7,6 +7,7 @@ export type DetailsSourceType =
 export interface FragranceDetails {
   description: string;
   fragranceFamily: string;
+  gender: 'women' | 'men' | 'unisex' | 'unknown';
   topNotes: string[];
   heartNotes: string[];
   baseNotes: string[];

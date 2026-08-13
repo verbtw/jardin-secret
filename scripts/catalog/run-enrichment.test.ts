@@ -18,6 +18,7 @@ class MemoryRepository implements EnrichmentRepository {
 
 const record: FragellaFragrance = {
   _id: 'oud-wood', Brand: 'Tom Ford', Name: 'Oud Wood', Year: '2007',
+  Gender: 'Unisex',
   OilType: 'Eau de Parfum', 'Image URL': 'https://cdn.fragella.com/oud-wood.jpg',
   'Main Accords': ['woody'], 'General Notes': ['Oud'],
   Notes: {Top: ['Rosewood'], Middle: ['Oud'], Base: ['Sandalwood']},
@@ -38,6 +39,7 @@ it('enriches every volume variant of an exact fragrance profile', async () => {
     heartNotes: ['Уд'],
     baseNotes: ['Сандал'],
     launchYear: 2007,
+    gender: 'unisex',
     imageUrl: 'https://cdn.fragella.com/oud-wood.jpg',
     sourceType: 'major_catalog',
   });

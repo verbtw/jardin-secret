@@ -26,6 +26,7 @@ interface OpenPerfumeRecord {
   family: string;
   accords: string[];
   ingredients: string[];
+  gender: string;
   year: string;
   imageName: string;
 }
@@ -81,7 +82,7 @@ export function parseOpenPerfumeCsv(csv: string): OpenPerfumeRecord[] {
   if (!headerLine) return [];
   const headers = headerLine.split('|');
   const index = (name: string) => headers.indexOf(name);
-  const required = ['brand', 'name_perfume', 'family', 'fragrances', 'ingredients', 'years', 'image_name'];
+  const required = ['brand', 'name_perfume', 'family', 'fragrances', 'ingredients', 'gender', 'years', 'image_name'];
   if (required.some((name) => index(name) < 0)) throw new Error('Unsupported open perfume dataset schema');
 
   return lines.map((line) => line.split('|')).filter((cells) => cells.length === headers.length).map((cells) => {
@@ -93,6 +94,7 @@ export function parseOpenPerfumeCsv(csv: string): OpenPerfumeRecord[] {
       family,
       accords: [...new Set([family, ...fragranceWords].filter(Boolean))],
       ingredients: parsePythonStringList(cells[index('ingredients')]),
+      gender: cells[index('gender')].trim(),
       year: cells[index('years')].trim(),
       imageName: cells[index('image_name')].trim(),
     };
@@ -201,6 +203,7 @@ export class OpenPerfumeDatasetProvider {
           Brand: record.brand,
           Name: record.name,
           Year: record.year,
+          Gender: record.gender,
           'Image URL': entry ? buildArchiveImageUrl(this.imageBaseUrl, archiveName, entry) : '',
           'General Notes': record.ingredients,
           'Main Accords': record.accords,

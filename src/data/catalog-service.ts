@@ -1,4 +1,5 @@
 import type {Product} from '../types/product';
+import type {ProductGender} from '../types/product';
 
 export interface PublicCatalogRow {
   id: string;
@@ -12,6 +13,7 @@ export interface PublicCatalogRow {
   price_status: 'pending' | 'published' | 'request' | 'review';
   availability: 'in_stock' | 'out_of_stock' | 'review';
   description: string;
+  gender: ProductGender;
   fragrance_family: string | null;
   top_notes: string[];
   heart_notes: string[];
@@ -42,6 +44,7 @@ interface CatalogClient {
 const catalogColumns = [
   'id', 'slug', 'brand', 'name', 'flanker', 'concentration', 'volume_ml',
   'retail_price_rub', 'price_status', 'availability', 'description',
+  'gender',
   'fragrance_family', 'top_notes', 'heart_notes', 'base_notes', 'key_notes',
   'key_accords', 'perfumers', 'launch_year', 'image_url', 'details_source_url',
   'details_status', 'updated_at',
@@ -61,7 +64,7 @@ export function mapCatalogRow(row: PublicCatalogRow): Product {
     concentration: row.concentration,
     volumeMl: Number(row.volume_ml),
     priceRub: row.price_status === 'published' ? row.retail_price_rub : null,
-    gender: 'unknown',
+    gender: row.gender,
     availability: row.availability === 'in_stock' ? 'in-stock' : 'ask-manager',
     description: row.description,
     notes,

@@ -6,6 +6,7 @@ import {
 } from './enrich-products.js';
 
 const completeDetails: FragranceDetails = {
+  gender: 'unisex',
   description: 'Древесный аромат с прохладным цитрусовым вступлением, мягким сердцем и стойкой тёплой базой.',
   fragranceFamily: 'Древесные',
   topNotes: ['Бергамот'],

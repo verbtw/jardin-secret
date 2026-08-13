@@ -7,6 +7,8 @@ it('renders the brand promise, contacts, and creator credit', () => {
   render(<App />);
   expect(screen.getByRole('heading', { name: 'Ваш тайный сад ароматов' })).toBeVisible();
   expect(screen.getByRole('link', { name: 'Написать менеджеру' })).toHaveAttribute('href', 'https://t.me/jardinmanager');
-  expect(screen.getByText('Сайт сделал verbtw')).toBeVisible();
+  expect(screen.queryByText('Сайт сделал verbtw')).not.toBeInTheDocument();
+  expect(screen.getByRole('link', { name: '@verbtwdev' })).toHaveAttribute('href', 'https://t.me/verbtwdev');
+  expect(screen.getByRole('link', { name: '@verbtwdev' })).toHaveAttribute('target', '_blank');
   expect(screen.getByRole('contentinfo')).toBeVisible();
 });
