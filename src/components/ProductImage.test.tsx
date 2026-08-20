@@ -35,3 +35,9 @@ it('keeps every image contained inside the shared studio surface', () => {
   expect(productImageCss).toMatch(/\.product-image--detail/);
   expect(productImageCss).toMatch(/\.product-image--compact/);
 });
+
+it('presents every perfume as an unaltered packshot on a pure white background', () => {
+  expect(productImageCss).toMatch(/\.product-image\s*\{[^}]*background:\s*#fff;/);
+  expect(productImageCss).toMatch(/\.product-image__media[^}]*mix-blend-mode:\s*normal;/);
+  expect(productImageCss).not.toMatch(/\.product-image__shadow\s*\{/);
+});

@@ -13,7 +13,6 @@ export function ProductImage({src, alt, variant, className = ''}: ProductImagePr
   return (
     <div className={classes} data-testid="product-image">
       <div className="product-image__stage">
-        <span className="product-image__shadow" aria-hidden="true" />
         <img
           className="product-image__media"
           src={src}
