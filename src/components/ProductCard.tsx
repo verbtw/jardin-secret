@@ -1,12 +1,14 @@
 import { Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { buildManagerUrl } from '../domain/telegram-order';
+import {formatDisplayName} from '../domain/display-name';
 import type { Product } from '../types/product';
 import { ProductImage } from './ProductImage';
 
 const rubles = new Intl.NumberFormat('ru-RU');
 
 export function ProductCard({ product }: { product: Product }) {
+  const displayName = formatDisplayName(product.name);
   return (
     <article className="product-card" data-testid="product-card">
       <Link className="product-card__image" to={`/product/${product.slug}`} aria-label={`${product.brand} ${product.name}`}>
@@ -14,7 +16,7 @@ export function ProductCard({ product }: { product: Product }) {
       </Link>
       <div className="product-card__body">
         <p className="product-card__brand product-brand-text">{product.brand}</p>
-        <h3><Link className="product-name-text" to={`/product/${product.slug}`}>{product.name}</Link></h3>
+        <h3><Link className="product-name-text" to={`/product/${product.slug}`}>{displayName}</Link></h3>
         <p className="product-card__meta">{product.volumeMl ? `${product.volumeMl} мл` : 'Объём уточнить'}</p>
         <div className="product-card__bottom">
           <strong>{product.priceRub ? `${rubles.format(product.priceRub)} ₽` : 'Уточнить'}</strong>

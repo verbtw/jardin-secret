@@ -28,3 +28,10 @@ it('presents every visible brand and fragrance name with capitalized words', () 
   expect(brandIdentityCss).toMatch(/\.product-brand-text[^}]*text-transform:\s*capitalize/);
   expect(brandIdentityCss).toMatch(/\.product-name-text[^}]*text-transform:\s*capitalize/);
 });
+
+it('normalizes an uppercase supplier fragrance name for display', () => {
+  render(<MemoryRouter><ProductCard product={{...product, name: 'BLACK LACQUER'}} /></MemoryRouter>);
+
+  expect(screen.getByText('Black Lacquer')).toBeVisible();
+  expect(screen.queryByText('BLACK LACQUER')).not.toBeInTheDocument();
+});

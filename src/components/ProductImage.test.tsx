@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { expect, it } from 'vitest';
 import { ProductImage } from './ProductImage';
 import productImageCss from '../product-images.css?raw';
+import storefrontPhotoSurfaceCss from '../storefront-photo-surface.css?raw';
 
 it('uses the shared card frame and lazy loading', () => {
   render(<ProductImage src="/bottle.jpg" alt="Maison Test Scent" variant="card" />);
@@ -40,4 +41,11 @@ it('presents every perfume as an unaltered packshot on a pure white background',
   expect(productImageCss).toMatch(/\.product-image\s*\{[^}]*background:\s*#fff;/);
   expect(productImageCss).toMatch(/\.product-image__media[^}]*mix-blend-mode:\s*normal;/);
   expect(productImageCss).not.toMatch(/\.product-image__shadow\s*\{/);
+});
+
+it('uses a clean white retail surface around every catalog packshot', () => {
+  expect(productImageCss).toMatch(/\.product-image--card[^}]*padding:\s*18px/);
+  expect(storefrontPhotoSurfaceCss).toMatch(/\.catalog-page\s*\{[^}]*background:\s*#fff/);
+  expect(storefrontPhotoSurfaceCss).toMatch(/\.catalog-page\s+\.page-heading\s*\{[^}]*background:\s*#fff/);
+  expect(storefrontPhotoSurfaceCss).toMatch(/\.product-card\s*\{[^}]*background:\s*#fff/);
 });

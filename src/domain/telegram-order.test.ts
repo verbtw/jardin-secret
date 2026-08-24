@@ -25,3 +25,9 @@ it('omits unknown variant fields without leaving broken punctuation', () => {
     'хочу заказать Tom Ford Oud Wood. Подскажите',
   );
 });
+
+it('uses the same readable title case as the storefront', () => {
+  expect(buildManagerMessage({...product, name: 'BLACK LACQUER'}, 'https://jardin-secret.ru')).toContain(
+    'Tom Ford Black Lacquer, EDP, 50 мл',
+  );
+});

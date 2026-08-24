@@ -3,6 +3,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, expect, it, vi } from 'vitest';
 import { getProducts } from '../data/catalog';
 import { ProductPage } from './ProductPage';
+import {formatDisplayName} from '../domain/display-name';
 
 const {useCatalogState} = vi.hoisted(() => ({useCatalogState: vi.fn()}));
 vi.mock('../hooks/useCatalogProducts', () => ({useCatalogState}));
@@ -18,10 +19,10 @@ it('opens Telegram with the current product already named', () => {
   expect(screen.getByRole('img', {name: `${product.brand} ${product.name}`})).toHaveAttribute('loading', 'eager');
   const link = screen.getByRole('link', {name: 'Написать менеджеру'});
   const text = new URL(link.getAttribute('href')!).searchParams.get('text');
-  expect(text).toContain(`${product.brand} ${product.name}`);
+  expect(text).toContain(`${product.brand} ${formatDisplayName(product.name)}`);
   expect(text).toContain(`/product/${product.slug}`);
   expect(screen.getByText(product.brand)).toHaveClass('product-brand-text');
-  expect(screen.getByRole('heading', {name: product.name})).toHaveClass('product-name-text');
+  expect(screen.getByRole('heading', {name: formatDisplayName(product.name)})).toHaveClass('product-name-text');
   expect(screen.queryByRole('button', {name: /Добавить в корзину/})).not.toBeInTheDocument();
 });
 

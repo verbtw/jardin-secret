@@ -1,5 +1,6 @@
 import { ArrowDownRight, Send } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {HeroPerfumeCarousel} from './HeroPerfumeCarousel';
 
 export function Hero() {
   return (
@@ -11,11 +12,11 @@ export function Hero() {
         <p className="hero__lead">Редкие и любимые ароматы без переплаты крупным сетям. Поможем выбрать тот самый.</p>
         <div className="hero__actions"><Link className="button" to="/catalog">Смотреть каталог <ArrowDownRight size={17} /></Link><a className="text-link" href="https://t.me/jardinmanager" target="_blank" rel="noreferrer" aria-label="Написать менеджеру"><Send size={16} />Написать менеджеру</a></div>
       </div>
-      <div className="hero__art" aria-hidden="true" data-testid="hero-media">
+      <section className="hero__art" aria-label="Выбранные ароматы" data-testid="hero-media">
         <div className="hero__media">
-          <img className="hero__photo" src="/hero/luxury-filled-perfume.webp" alt="" role="presentation" onError={(event) => { event.currentTarget.hidden = true; }} />
+          <HeroPerfumeCarousel />
         </div>
-      </div>
+      </section>
       <div className="hero__index"><span>01</span><i /><span>Найдите свой аромат</span></div>
     </section>
   );

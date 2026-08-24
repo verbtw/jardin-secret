@@ -4,6 +4,7 @@ import { buildManagerUrl } from '../domain/telegram-order';
 import { useCatalogState } from '../hooks/useCatalogProducts';
 import { FragranceNotes } from '../components/FragranceNotes';
 import { ProductImage } from '../components/ProductImage';
+import {formatDisplayName} from '../domain/display-name';
 
 const rubles = new Intl.NumberFormat('ru-RU');
 
@@ -13,13 +14,14 @@ export function ProductPage() {
   const product = products.find((item) => item.slug === slug);
   if (!product && isLoading) return <main className="empty-page"><p className="eyebrow">Каталог</p><h1>Загружаем аромат…</h1></main>;
   if (!product) return <main className="empty-page"><p className="eyebrow">404</p><h1>Аромат не найден</h1><Link className="button" to="/catalog">Вернуться в каталог</Link></main>;
+  const displayName = formatDisplayName(product.name);
   return (
     <main className="product-page">
       <Link className="back-link" to="/catalog"><ArrowLeft size={16} />Назад в каталог</Link>
       <div className="product-detail">
         <ProductImage src={product.imageUrl} alt={`${product.brand} ${product.name}`} variant="detail" className="product-detail__image" />
         <div className="product-detail__copy">
-          <p className="product-detail__brand product-brand-text">{product.brand}</p><h1 className="product-name-text">{product.name}</h1>
+          <p className="product-detail__brand product-brand-text">{product.brand}</p><h1 className="product-name-text">{displayName}</h1>
           <p className="product-detail__price">{product.priceRub ? `${rubles.format(product.priceRub)} ₽` : 'Цену уточнит менеджер'}</p>
           <div className="detail-facts"><span><small>Объём</small>{product.volumeMl ? `${product.volumeMl} мл` : 'Уточнить'}</span><span><small>Наличие</small>{product.availability === 'in-stock' ? 'В наличии' : 'Уточнить'}</span><span><small>Оригинальность</small>100% оригинал</span></div>
           {product.description && <p className="product-description">{product.description}</p>}

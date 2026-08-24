@@ -3,11 +3,12 @@ import {MemoryRouter} from 'react-router-dom';
 import {expect, it} from 'vitest';
 import {Hero} from './Hero';
 
-it('uses the filled luxury perfume image without the old branded bottle markup', () => {
+it('uses the rotating real-perfume showcase instead of the decorative lifestyle photo', () => {
   render(<MemoryRouter><Hero /></MemoryRouter>);
 
-  expect(screen.getByTestId('hero-media')).toHaveAttribute('aria-hidden', 'true');
-  expect(screen.getByRole('presentation', {hidden: true})).toHaveAttribute('src', '/hero/luxury-filled-perfume.webp');
+  expect(screen.getByTestId('hero-media')).toHaveAttribute('aria-label', 'Выбранные ароматы');
+  expect(screen.getByRole('img', {name: 'Nishane Hacivat'})).toBeVisible();
+  expect(screen.queryByRole('presentation', {hidden: true})).not.toBeInTheDocument();
   expect(document.querySelector('.perfume-bottle')).not.toBeInTheDocument();
   expect(document.querySelector('.glass-orb')).not.toBeInTheDocument();
 });
